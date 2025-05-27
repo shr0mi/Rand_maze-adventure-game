@@ -23,7 +23,6 @@ class TileMap : public sf::Drawable, public sf::Transformable{
                     // Note that here the tileset has gap **between** all tiles.
                     int tu = ((tileNum-1) % ((tileSize.x+gap) / (width + gap))) * (width+gap);
                     int tv = ((tileNum-1) / ((tileSize.x+gap) / (width + gap))) * (height+gap);
-                    //std::cout << tu << " " << tv << " " << tileNum << std::endl;
 
                     //Get 2 triangles for each tile
                     sf::Vertex* tri1 = &m_vertices[cur_Vertex];
