@@ -5,7 +5,7 @@
 #include <iostream>
 #include <cmath>
 
-const float BULLET_SPEED = 250.0f;
+const float BULLET_SPEED = 255.0f;
 const float ENEMY_SPEED = 60.0f;
 const float SHOOT_RANGE = 300.0f;
 const float EXPLODE_RANGE = 50.0f;
