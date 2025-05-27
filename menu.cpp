@@ -10,15 +10,15 @@ int main()
     sf::RenderWindow window(sf::VideoMode({450, 400}), "Main Menu");
 
     // Load font
-    sf::Font font("C:/Windows/Fonts/arial.ttf");
+    sf::Font font("arial.ttf");
     // Load textures
     sf::Texture playTexture, optionTexture, exitTexture;
-    if (!playTexture.loadFromFile("PNG/Blue/Default/button_rectangle_border.png") || !optionTexture.loadFromFile("PNG/Blue/Default/button_rectangle_border.png") || !exitTexture.loadFromFile("PNG/Blue/Default/button_rectangle_border.png")) 
+    if (!playTexture.loadFromFile("button_rectangle_border.png") || !optionTexture.loadFromFile("PNG/Blue/Default/button_rectangle_border.png") || !exitTexture.loadFromFile("PNG/Blue/Default/button_rectangle_border.png")) 
     {
         return -1; // Error if images not found
     }
     // Load sound
-    sf::SoundBuffer buffer("Sounds/click-a.ogg");
+    sf::SoundBuffer buffer("click-a.ogg");
     sf::Sound sound(buffer);
 
     // Create Title
