@@ -3,13 +3,6 @@
 #include <SFML/Audio.hpp>
 #include <optional>
 
-enum class GameState
-{
-    MainMenu,
-    Playing,
-    Options
-};
-
 //  Main program
 int main()
 {
@@ -35,7 +28,7 @@ int main()
     text.setStyle(sf::Text::Italic | sf::Text::Bold);
 
     // Define Play Button
-    // Create sprites
+    // Create sprite
     sf::Sprite playButton(playTexture);
     playButton.setPosition({100, 100});
     
@@ -45,7 +38,7 @@ int main()
     playText.setStyle(sf::Text::Bold);
 
     // Define Option Button
-    // Create sprites
+    // Create sprite
     sf::Sprite optionButton(optionTexture);
     optionButton.setPosition({100, 180});
     
@@ -55,7 +48,7 @@ int main()
     optionText.setStyle(sf::Text::Bold);
 
     // Define Exit Button
-    // Create sprites
+    // Create sprite
     sf::Sprite exitButton(exitTexture);
     exitButton.setPosition({100, 260});
 
@@ -63,10 +56,6 @@ int main()
     exitText.setFillColor(sf::Color::Black);
     exitText.setPosition({165, 270});
     exitText.setStyle(sf::Text::Bold);
-
-    // Game state
-    GameState state = GameState::MainMenu;
-    bool shouldCloseAfterPlay = false;
 
     // While window is still open
     while (window.isOpen())
@@ -87,16 +76,30 @@ int main()
                 if (playButton.getGlobalBounds().contains(mousePos))
                 {
                     sound.play(); // Play sound
-                    state = GameState::Playing;  // Switch to play state
-                    window.setTitle("Playing Game"); // <-- New title here
-                    shouldCloseAfterPlay = true;
+                    window.close(); // Exit from main window
+
+                    // Play button clicked: open a new window briefly
+                    sf::RenderWindow playWindow(sf::VideoMode({450, 400}), "Game Window");
+                    playWindow.clear(sf::Color::White);
+                    playWindow.display();
+
+                    sf::sleep(sf::seconds(2)); // Show for 2 seconds
+                    playWindow.close();
+                    
                 }
                 else if (optionButton.getGlobalBounds().contains(mousePos))
                 {
                     sound.play(); // Play sound
-                    state = GameState::Options;  // Switch to option state
-                    window.setTitle("Options"); // <-- New title here
-                    shouldCloseAfterPlay = true;
+                    window.close(); // Exit from main window
+
+                    // Option button clicked: open a new window briefly
+                    sf::RenderWindow playWindow(sf::VideoMode({450, 400}), "Settings");
+                    playWindow.clear(sf::Color::White);
+                    playWindow.display();
+
+                    sf::sleep(sf::seconds(2)); // Show for 2 seconds
+                    playWindow.close();
+                    
                 }
                 else if (exitButton.getGlobalBounds().contains(mousePos))
                 {
@@ -109,40 +112,16 @@ int main()
 
         window.clear(sf::Color::White);
 
-        if (state == GameState::MainMenu)
-        {
-            window.draw(text);
-            window.draw(playButton);
-            window.draw(playText);
-            window.draw(optionButton);
-            window.draw(optionText);
-            window.draw(exitButton);
-            window.draw(exitText);
-        }
-        else if (state == GameState::Playing)
-        {
-            // Play screen logic - just a placeholder screen
-            sf::Text playingText(font, "Now Playing!", 28);
-            playingText.setFillColor(sf::Color::Blue);
-            playingText.setPosition({120, 180});
-            window.draw(playingText);
-        }
-        else if (state == GameState::Options)
-        {
-            // Play screen logic - just a placeholder screen
-            sf::Text playingText(font, "Settings!", 28);
-            playingText.setFillColor(sf::Color::Blue);
-            playingText.setPosition({120, 180});
-            window.draw(playingText);
-        }
+        window.draw(text);
+        window.draw(playButton);
+        window.draw(playText);
 
+        window.draw(optionButton);
+        window.draw(optionText);
+
+        window.draw(exitButton);
+        window.draw(exitText);
         window.display();
-        
-        if (shouldCloseAfterPlay)
-        {     
-            sf::sleep(sf::seconds(2)); // Show play screen for 2 seconds
-            window.close();            // Now close
-        }
     }
 
     return 0;
