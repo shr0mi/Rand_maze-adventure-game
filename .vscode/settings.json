@@ -1,17 +1,3 @@
 {
-    "files.associations": {
-        "array": "cpp",
-        "bitset": "cpp",
-        "chrono": "cpp",
-        "deque": "cpp",
-        "string": "cpp",
-        "vector": "cpp",
-        "string_view": "cpp",
-        "ranges": "cpp",
-        "span": "cpp",
-        "stacktrace": "cpp",
-        "text_encoding": "cpp",
-        "regex": "cpp",
-        "valarray": "cpp"
-    }
+    "C_Cpp.errorSquiggles": "disabled"
 }
