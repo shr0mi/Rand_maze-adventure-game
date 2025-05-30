@@ -7,7 +7,7 @@ constexpr float BULLET_COOLDOWN = 0.2f; // 5 bullets per second
 Player::Player(sf::Texture& tex, int row, int col)
     : sprite(tex, sf::IntRect({col * 17, row * 17}, {16, 16})) {
     sprite.setPosition({400.f, 300.f});
-    sprite.setScale({5.f,5.f});
+    sprite.setScale({3.f,3.f});
 }
 
 void Player::update(float dt) {
@@ -52,7 +52,7 @@ sf::View Player::getView() const {
 Crosshair::Crosshair(sf::Texture& tex, int row, int col)
     : sprite(tex, sf::IntRect({col * 17, row * 17}, {16, 16})) {
     sprite.setPosition({300.f, 200.f});
-    sprite.setScale({3.f,3.f});
+    sprite.setScale({2.f,2.f});
 }
 
 void Crosshair::draw(sf::RenderWindow& window) {

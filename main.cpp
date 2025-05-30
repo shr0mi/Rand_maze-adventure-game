@@ -53,6 +53,12 @@ int main() {
     std::vector<Bullet> bullets;
     std::vector<EnemyBullet> enmbull;
 
+     std::vector<std::unique_ptr<BaseEnemy>> enemies;
+    enemies.push_back(std::make_unique<ShooterEnemy>(texture, 200.f, 100.f));
+    enemies.push_back(std::make_unique<ShooterEnemy>(texture, 600.f, 100.f));
+    enemies.push_back(std::make_unique<ExploderEnemy>(texture, 600.f, 300.f));
+    enemies.push_back(std::make_unique<ExploderEnemy>(texture, 700.f, 100.f));
+
     sf::Clock clock;
 
     while (window.isOpen()) {
@@ -71,9 +77,11 @@ int main() {
         
        // handleKeyChestInteraction(keys, chest,player.getPosition());
 
-   
+        for (auto &enemy : enemies)
+            enemy->update(dt, player.getPosition(), enmbull);
 
-
+         for (auto &eBullet : enmbull)
+            eBullet.update(dt);
 
         player.update(dt);
         crosshair.update(window);
@@ -82,6 +90,10 @@ int main() {
   window.setView(player.getView());
 for (const auto& bullet : bullets)
     bullet.draw(window);
+     for (auto &eBullet : enmbull)
+            window.draw(eBullet.shape);
+       for (auto &enemy : enemies)
+            enemy->draw(window);       
 /*for (const auto& key : keys)
     key.draw(window);  
 chest.draw(window);*/

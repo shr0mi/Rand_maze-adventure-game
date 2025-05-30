@@ -10,6 +10,8 @@
                 "-g",
                 "main.cpp",
                 "player.cpp",
+                "enemy.cpp",
+                "mapgen.cpp",
                 "-IE:/C++ Library/SFML-3.0.0/include",
                 "-DSFML_STATIC",
                 "-o",
