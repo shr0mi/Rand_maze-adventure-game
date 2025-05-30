@@ -77,13 +77,14 @@ int main()
 
             if (event->is<sf::Event::MouseButtonPressed>())
             {
-                auto mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
+                //auto mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
+                auto mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
                 if (playButton.getGlobalBounds().contains(mousePos))
                 {
-                    //playButton.setScale({0.8f, 0.8f});
+                    playButton.setScale({0.8f, 0.8f});
                     sound.play(); // Play sound
-                    //sf::sleep(sf::milliseconds(200));
+                    sf::sleep(sf::milliseconds(200));
 
                     window.close(); // Exit from main window
                     std::system("main.exe");
