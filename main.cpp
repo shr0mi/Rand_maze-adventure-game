@@ -1,112 +1,164 @@
+// #include "enemy.hpp"
+// #include <SFML/Audio.hpp>
+// #include <iostream>
+
+// void runGame()
+// {
+//     sf::RenderWindow window(sf::VideoMode({800, 600}), "SFML - Shooter and Exploder");
+//     window.setFramerateLimit(60);
+
+//     sf::Texture texture;
+//     if (!texture.loadFromFile("colored-transparent.png")) {
+//         std::cerr << "Failed to load texture.\n";
+//         return;
+//     }
+
+//     sf::Sprite player(texture);
+//     player.setTextureRect(sf::IntRect({(26 - 1) * 17, (5 - 1) * 17}, {16, 16}));
+//     player.setScale({2, 2});
+//     player.setPosition({400, 300});
+
+//     std::vector<std::unique_ptr<BaseEnemy>> enemies;
+//     enemies.push_back(std::make_unique<ShooterEnemy>(texture, 200, 100));
+//     enemies.push_back(std::make_unique<ShooterEnemy>(texture, 640, 100));
+//     enemies.push_back(std::make_unique<ExploderEnemy>(texture, 600, 100));
+//     enemies.push_back(std::make_unique<ExploderEnemy>(texture, 700, 100));
+//     enemies.push_back(std::make_unique<ExploderEnemy>(texture, 600, 300));
+
+//     std::vector<Bullet> bullets;
+//     sf::Clock deltaClock;
+
+//     while (window.isOpen()) {
+//         float dt = deltaClock.restart().asSeconds();
+
+//         while (const std::optional<sf::Event> event = window.pollEvent()) {
+//             if (event->is<sf::Event::Closed>())
+//                 window.close();
+//         }
+
+//         sf::Vector2f move(0, 0);
+//         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up)) move.y -= 1;
+//         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down)) move.y += 1;
+//         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) move.x -= 1;
+//         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) move.x += 1;
+//         player.move(normalize(move) * PLAYER_SPEED * dt);
+
+//         for (auto& enemy : enemies)
+//             enemy->update(dt, player.getPosition(), bullets);
+
+//         for (auto& bullet : bullets)
+//             bullet.update(dt);
+
+//         window.clear(sf::Color::Black);
+//         window.draw(player);
+//         for (auto& enemy : enemies)
+//             enemy->draw(window);
+//         for (auto& bullet : bullets)
+//             window.draw(bullet.shape);
+//         window.display();
+//     }
+// }
+
+// int main() {
+//     runGame();
+//     return 0;
+// }
+#include "enemy.hpp"
+#include "player.h"
 #include <SFML/Graphics.hpp>
-#include<bits/stdc++.h>
-
-class TileMap : public sf::Drawable, public sf::Transformable{
-    public:
-        bool load(const std::string& tileset, sf::Vector2u tileSize, const std::vector<std::vector<int>>& tiles, unsigned int width, unsigned int height, unsigned int gap)
-        {
-            // Check if Tileset exists
-            if(!m_tileset.loadFromFile(tileset)) return false;
-
-            // Resizing vertex array to fit level size
-            m_vertices.setPrimitiveType(sf::PrimitiveType::Triangles);
-            m_vertices.resize(tiles.size() * tiles[0].size() * 6); // 6 vertecies per tile
-            int cur_Vertex = 0;
-
-            // Populate vertex array with two triangles per tile
-            for(unsigned int i=0; i<tiles.size(); i++){
-                for(unsigned int j=0; j<tiles[i].size(); j++){
-                    // Tilenumber
-                    int tileNum = tiles[i][j];
-
-                    // Finding Position in Tileset Texture
-                    // Note that here the tileset has gap **between** all tiles.
-                    int tu = ((tileNum-1) % ((tileSize.x+gap) / (width + gap))) * (width+gap);
-                    int tv = ((tileNum-1) / ((tileSize.x+gap) / (width + gap))) * (height+gap);
-
-                    //Get 2 triangles for each tile
-                    sf::Vertex* tri1 = &m_vertices[cur_Vertex];
-                    sf::Vertex* tri2 = &m_vertices[cur_Vertex + 3];
-
-                    cur_Vertex += 6;
-
-                    // Setting positions
-                    unsigned int x = j * width;
-                    unsigned int y = i * height;
-                    unsigned int scale = 3;
-                    x*=scale; y*=scale;
-                    x+=gap; y+=gap;
-                    tri1[0].position = sf::Vector2f(x, y);
-                    tri1[1].position = sf::Vector2f(x + width*scale, y);
-                    tri1[2].position = sf::Vector2f(x + width*scale, y + height*scale);
-
-                    tri2[0].position = sf::Vector2f(x, y);
-                    tri2[1].position = sf::Vector2f(x, y+height*scale);
-                    tri2[2].position = sf::Vector2f(x + width*scale, y + height*scale);
-
-                    // Setting texture coordinates
-                    tri1[0].texCoords = sf::Vector2f(tu, tv);
-                    tri1[1].texCoords = sf::Vector2f(tu + width, tv);
-                    tri1[2].texCoords = sf::Vector2f(tu + width, tv + height);
-
-                    tri2[0].texCoords = sf::Vector2f(tu, tv);
-                    tri2[1].texCoords = sf::Vector2f(tu, tv + height);
-                    tri2[2].texCoords = sf::Vector2f(tu + width, tv + height);
-
-                
-                }
-            }
-
-            return true;
-        }
-
-    private:
-        virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
-        {
-            // apply the transform
-            states.transform *= getTransform();
-
-            // apply the tileset texture
-            states.texture = &m_tileset;
-
-            // draw the vertex array
-            target.draw(m_vertices, states);
-        }
-
-        sf::VertexArray m_vertices;
-        sf::Texture m_tileset;
-        
-};
+#include <SFML/Audio.hpp>
+#include <iostream>
+#include <memory>
+#include <vector>
 
 int main()
 {
-    std::cerr << "Terminal working" << std::endl;
-    sf::RenderWindow window(sf::VideoMode({500, 500}), "TileMap works!");
+    sf::RenderWindow window(sf::VideoMode({800, 600}), "Game: Player and Enemies");
+    window.setFramerateLimit(60);
 
-    // Level Vector
-    std::vector<std::vector<int>> level={
-        {48, 49, 50, 51, 52, 53, 54, 55},
-        {9, 10, 11, 12, 13, 14, 15, 16}
-    };
-
-    //Render Tilemap
-    TileMap map;
-    if(!map.load("colored-transparent.png", sf::Vector2u(832, 373), level, 16, 16, 1))
+    sf::Texture texture;
+    if (!texture.loadFromFile("colored-transparent.png"))
     {
-        std::cerr << "Failed to load tilemap!" << std::endl;
+        std::cerr << "Failed to load texture.\n";
         return -1;
     }
 
+    // --- Create Player ---
+    Player player(texture, 5, 25); // pick sprite row, col for player
+
+    // --- Crosshair ---
+    Crosshair crosshair(texture, 5, 26);
+
+    // --- Enemies ---
+    std::vector<std::unique_ptr<BaseEnemy>> enemies;
+    enemies.push_back(std::make_unique<ShooterEnemy>(texture, 200.f, 100.f));
+    enemies.push_back(std::make_unique<ShooterEnemy>(texture, 600.f, 100.f));
+    enemies.push_back(std::make_unique<ExploderEnemy>(texture, 600.f, 300.f));
+    enemies.push_back(std::make_unique<ExploderEnemy>(texture, 700.f, 100.f));
+
+    // --- Keys & Chest ---
+    std::vector<Key> keys = {
+        Key(texture, {150.f, 400.f}, 2, 5),
+        Key(texture, {300.f, 500.f}, 2, 5),
+        Key(texture, {600.f, 350.f}, 2, 5)};
+    Chest chest(texture, {700.f, 500.f});
+
+    // --- Bullets ---
+    // std::vector<Bullet> bullets;
+    std::vector<Bullet> playerBullets;
+    std::vector<EnemyBullet> enemyBullets;
+
+    sf::Clock deltaClock;
+
     while (window.isOpen())
     {
-        while (const std::optional event = window.pollEvent())
+        float dt = deltaClock.restart().asSeconds();
+
+        while (const std::optional<sf::Event> event = window.pollEvent())
         {
             if (event->is<sf::Event::Closed>())
                 window.close();
         }
-        
-        window.clear();
-        window.draw(map);
+
+        // --- Update ---
+        player.update(dt);
+        crosshair.update(window);
+
+        for (auto &enemy : enemies)
+            enemy->update(dt, player.getPosition(), enemyBullets);
+
+        // MISSING:
+        for (auto &eBullet : enemyBullets)
+            eBullet.update(dt);
+
+        handleShooting(playerBullets, texture, player.getPosition(), window);
+        updateBullets(playerBullets, dt, window);
+
+        handleKeyChestInteraction(keys, chest, player.getPosition());
+
+        // --- Draw ---
+        window.clear(sf::Color::Black);
+        player.draw(window);
+        crosshair.draw(window);
+
+        for (auto &key : keys)
+            key.draw(window);
+
+        chest.draw(window);
+
+        for (auto &enemy : enemies)
+            enemy->draw(window);
+
+        // for (auto &bullet : bullets)
+        //     bullet.draw(window);
+        for (auto &bullet : playerBullets)
+            bullet.draw(window);
+
+        for (auto &eBullet : enemyBullets)
+            window.draw(eBullet.shape); // enemy bullets are just CircleShape
+
         window.display();
     }
+
+    return 0;
 }
