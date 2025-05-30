@@ -26,6 +26,7 @@ void Player::update(float dt) {
         move *= speed * dt; // scale movement by speed and time
         sprite.move(move);  // apply movement
     }
+     cameraCenter += (sprite.getPosition() - cameraCenter) * cameraLag * dt; // interpolate camera
 }
 
 void Player::draw(sf::RenderWindow& window) {
@@ -41,6 +42,12 @@ sf::Vector2f Player::getPosition() {
 
 }
 
+sf::View Player::getView() const {
+    sf::View view;
+    view.setSize({500.f, 500.f}); // your window size
+    view.setCenter(cameraCenter);
+    return view;
+}
 
 Crosshair::Crosshair(sf::Texture& tex, int row, int col)
     : sprite(tex, sf::IntRect({col * 17, row * 17}, {16, 16})) {
@@ -52,7 +59,7 @@ void Crosshair::draw(sf::RenderWindow& window) {
     window.draw(sprite);
 }
 void Crosshair::update(const sf::RenderWindow& window) {
-    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+    sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
     sprite.setPosition(static_cast<sf::Vector2f>(mousePos));
 }
 
@@ -107,9 +114,9 @@ void updateBullets(std::vector<Bullet>& bullets, float dt, const sf::RenderWindo
         bullet.update(dt);
     }
 
-    bullets.erase(std::remove_if(bullets.begin(), bullets.end(),
+    /*bullets.erase(std::remove_if(bullets.begin(), bullets.end(),
         [&](const Bullet& b) { return b.isOffScreen(window); }),
-        bullets.end());
+        bullets.end());*/
 }
 
 Key::Key(sf::Texture& tex, sf::Vector2f position, int col, int row)

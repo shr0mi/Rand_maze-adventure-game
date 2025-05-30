@@ -15,6 +15,8 @@ public:
     void draw(sf::RenderWindow& window);
     sf::Vector2f getPosition() const;
     sf::Vector2f getPosition();
+    sf::View getView() const;
+    sf::Vector2f cameraCenter;
 
 
 private:
@@ -28,6 +30,7 @@ private:
     sf::Vector2f dashDirection;
     float dashCooldown = 100.0f;  
     float dashCooldownTimer = 0.f;
+     float cameraLag = 4.0f;
 };
 
 
