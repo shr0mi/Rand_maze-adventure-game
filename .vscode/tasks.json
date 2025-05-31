@@ -9,6 +9,7 @@
                 "-g",
                 "main.cpp",
                 "enemy.cpp",
+                "player.cpp",
                 // "${file}",
                 "-IC:/C++ Libraries/SFML-3.0.0/include",
                 "-DSFML_STATIC",
@@ -28,6 +29,10 @@
                 "-lvorbisfile",
                 "-lvorbis",
                 "-logg",
+                "-static-libgcc",
+                "-static-libstdc++",
+                "-static",
+                "-mconsole"
                 // "-mwindows"
             ],
             "options": {
