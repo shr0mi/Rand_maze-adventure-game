@@ -26,6 +26,10 @@
                 "-lvorbisfile",
                 "-lvorbis",
                 "-logg",
+                "-static-libgcc",
+                "-static-libstdc++",
+                "-static",
+                "-mconsole",
                 "-mwindows"
             ],
             "options": {
