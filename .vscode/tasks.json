@@ -8,6 +8,7 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "${file}",
+                "option.cpp",
                 "-I\"C:/Users/USER/Documents/SFML-3.0.0/include\"",
                 "-DSFML_STATIC",
                 "-o",
