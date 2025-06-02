@@ -95,6 +95,8 @@ int main()
     enemies.push_back(std::make_unique<ShooterEnemy>(texture, 600.f, 100.f));
     enemies.push_back(std::make_unique<ExploderEnemy>(texture, 600.f, 300.f));
     enemies.push_back(std::make_unique<ExploderEnemy>(texture, 700.f, 100.f));
+    enemies.push_back(std::make_unique<TurretEnemy>(texture, 400.f, 300.f));
+
 
     // --- Keys & Chest ---
     std::vector<Key> keys = {

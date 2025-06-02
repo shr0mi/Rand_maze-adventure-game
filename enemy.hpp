@@ -65,3 +65,18 @@ private:
     sf::Sprite sprite;
     bool active = true;
 };
+
+// TurretEnemy class - shoots in a circular pattern every 2 seconds
+class TurretEnemy : public BaseEnemy {
+public:
+    TurretEnemy(sf::Texture& texture, float x, float y);
+
+    void update(float dt, const sf::Vector2f& playerPos, std::vector<EnemyBullet>& bullets) override;
+    void draw(sf::RenderWindow& window) override;
+
+private:
+    sf::Sprite sprite;
+    sf::Clock shootClock;
+    const float shootInterval = 2.0f;
+    const int bulletCount = 12; // how many bullets per burst
+};
