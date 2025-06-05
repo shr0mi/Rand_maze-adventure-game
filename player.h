@@ -7,9 +7,12 @@
 #include <memory>
 
 
+
 class Player {
 public:
-    Player(sf::Texture& tex, int row, int col);
+    Player(sf::Texture& tex, int row, int col,std::vector<std::vector<int>> collisionMap);
+
+
 
     void update(float dt);
     void draw(sf::RenderWindow& window);
@@ -17,6 +20,14 @@ public:
     sf::Vector2f getPosition();
     sf::View getView() const;
     sf::Vector2f cameraCenter;
+    bool cheatMode = false;
+    sf::View normalView;
+    sf::View mapView;
+    void handleCheatCode();
+    bool isCheatMode() const; 
+    
+
+
 
 
 private:

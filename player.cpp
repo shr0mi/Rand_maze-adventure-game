@@ -1,23 +1,86 @@
 #include "player.h"
 #include <cmath>
 #include <algorithm>
+#include <vector>
+#include <iostream>
 
 constexpr float BULLET_COOLDOWN = 0.2f; // 5 bullets per second
-
-Player::Player(sf::Texture& tex, int row, int col)
+std::vector<std::vector<int>> level;
+Player::Player(sf::Texture& tex, int row, int col,std::vector<std::vector<int>> collisionMap)
     : sprite(tex, sf::IntRect({col * 17, row * 17}, {16, 16})) {
-    sprite.setPosition({400.f, 300.f});
-    sprite.setScale({3.f,3.f});
+    sprite.setPosition({510.f, 510.f});
+    sprite.setScale({1.f,1.f});
+    level=collisionMap;
 }
+
+
 
 void Player::update(float dt) {
     sf::Vector2f move(0.f, 0.f);
-    float speed = 400.f; // units per second — adjust as needed
+    sf::Vector2f newPosition(0.f, 0.f);
+    float speed = 100.f; // units per second — adjust as needed
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) move.y -= 1.f;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) move.y += 1.f;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) move.x -= 1.f;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) move.x += 1.f;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+
+          newPosition = sprite.getPosition();
+        newPosition.y -= 17.f;
+        int x = newPosition.x / 17;
+        int y = newPosition.y / 17;
+
+        if(level[y][x] == 0){
+            move.y -= 1.f;
+        }else{
+            std::cout << "Collision detected at: " << x << ", " << y << "\n";
+        }
+    
+
+    
+    
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+    
+        newPosition = sprite.getPosition();
+        newPosition.y += 17.f;
+        int x = newPosition.x / 17;
+        int y = newPosition.y / 17;
+
+        if(level[y][x] == 0){
+            move.y += 1.f;
+        }else{
+            std::cout << "Collision detected at: " << x << ", " << y << "\n";
+        }
+    
+
+    }
+
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+        newPosition = sprite.getPosition();
+        newPosition.x -= 17.f;
+        int x = newPosition.x / 17;
+        int y = newPosition.y / 17;
+
+        if(level[y][x] == 0){
+            move.x -= 1.f;
+        }else{
+            std::cout << "Collision detected at: " << x << ", " << y << "\n";
+        }
+    }
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)){
+        newPosition = sprite.getPosition();
+        newPosition.x += 17.f;
+        int x = newPosition.x / 17;
+        int y = newPosition.y / 17;
+
+        if(level[y][x] == 0){
+            move.x += 1.f;
+        }else{
+            std::cout << "Collision detected at: " << x << ", " << y << "\n";
+        }
+        
+        
+    }
 
     // Normalize movement
     if (move.x != 0.f || move.y != 0.f) {
@@ -49,10 +112,13 @@ sf::View Player::getView() const {
     return view;
 }
 
+
+
+
 Crosshair::Crosshair(sf::Texture& tex, int row, int col)
     : sprite(tex, sf::IntRect({col * 17, row * 17}, {16, 16})) {
     sprite.setPosition({300.f, 200.f});
-    sprite.setScale({2.f,2.f});
+    sprite.setScale({1.f,1.f});
 }
 
 void Crosshair::draw(sf::RenderWindow& window) {
@@ -60,13 +126,13 @@ void Crosshair::draw(sf::RenderWindow& window) {
 }
 void Crosshair::update(const sf::RenderWindow& window) {
     sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-    sprite.setPosition(static_cast<sf::Vector2f>(mousePos));
+    sprite.setPosition(static_cast<sf::Vector2f>(sf::Vector2f(mousePos.x - 8.f, mousePos.y - 8.f)));
 }
 
 Bullet::Bullet(sf::Texture& tex,const sf::Vector2f& startPos, const sf::Vector2f& targetPos,int row,int col)
  : sprite(tex, sf::IntRect({col * 17, row * 17}, {16, 16})){
     sprite.setPosition(startPos);
-    sprite.setScale({5.f,5.f});
+    sprite.setScale({1.f,1.f});
     sf::Vector2f direction = targetPos - startPos;
     float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
     if (length != 0)
