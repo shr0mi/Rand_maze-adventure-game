@@ -5,7 +5,7 @@
 SliderVolume::SliderVolume(float x, float y, float width)
     : isDragging(false), volumeText(font, "", 18)
 {
-    bar.setSize(sf::Vector2f(width, 5));
+    bar.setSize(sf::Vector2f(width, 50));
     bar.setFillColor(sf::Color(150, 150, 150));
     bar.setPosition({x, y});
 

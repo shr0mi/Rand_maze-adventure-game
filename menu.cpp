@@ -94,15 +94,10 @@ int main()
                 {
                     optionButton.setScale({0.8f, 0.8f});
                     sound.play(); // Play sound
+                    sf::sleep(sf::milliseconds(200));
+
                     window.close(); // Exit from main window
-
-                    // Option button clicked: open a new window briefly
-                    sf::RenderWindow playWindow(sf::VideoMode({450, 400}), "Settings");
-                    playWindow.clear(sf::Color::White);
-                    playWindow.display();
-
-                    sf::sleep(sf::seconds(2)); // Show for 2 seconds
-                    playWindow.close();
+                    std::system("slider.exe");
                     
                 }
                 else if (exitButton.getGlobalBounds().contains(mousePos))
