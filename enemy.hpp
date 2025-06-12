@@ -10,43 +10,49 @@ constexpr float EXPLODE_RANGE = 50.0f;
 constexpr float BULLET_SPEED = 250.0f;
 
 // Normalize helper
-inline sf::Vector2f normalize(sf::Vector2f v) {
+inline sf::Vector2f normalize(sf::Vector2f v)
+{
     float len = std::sqrt(v.x * v.x + v.y * v.y);
     return (len != 0.f) ? v / len : sf::Vector2f(0.f, 0.f);
 }
 
 // Bullet struct
-struct EnemyBullet {
+struct EnemyBullet
+{
     sf::CircleShape shape;
     sf::Vector2f velocity;
 
-    EnemyBullet(sf::Vector2f pos, sf::Vector2f dir) {
+    EnemyBullet(sf::Vector2f pos, sf::Vector2f dir)
+    {
         shape.setRadius(5);
         shape.setFillColor(sf::Color::Red);
         shape.setPosition(pos);
         velocity = normalize(dir) * BULLET_SPEED;
     }
 
-    void update(float dt) {
+    void update(float dt)
+    {
         shape.move(velocity * dt);
     }
 };
 
 // Base enemy class (optional if shared behavior increases)
-class BaseEnemy {
+class BaseEnemy
+{
 public:
-    virtual void update(float dt, const sf::Vector2f& playerPos, std::vector<EnemyBullet>& bullets) = 0;
-    virtual void draw(sf::RenderWindow& window) = 0;
+    virtual void update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &bullets) = 0;
+    virtual void draw(sf::RenderWindow &window) = 0;
     virtual ~BaseEnemy() = default;
 };
 
 // ShooterEnemy class
-class ShooterEnemy : public BaseEnemy {
+class ShooterEnemy : public BaseEnemy
+{
 public:
-    ShooterEnemy(sf::Texture& texture, float x, float y);
+    ShooterEnemy(sf::Texture &texture, float x, float y);
 
-    void update(float dt, const sf::Vector2f& playerPos, std::vector<EnemyBullet>& bullets) override;
-    void draw(sf::RenderWindow& window) override;
+    void update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &bullets) override;
+    void draw(sf::RenderWindow &window) override;
 
 private:
     sf::Sprite sprite;
@@ -54,25 +60,28 @@ private:
 };
 
 // ExploderEnemy class
-class ExploderEnemy : public BaseEnemy {
+class ExploderEnemy : public BaseEnemy
+{
 public:
-    ExploderEnemy(sf::Texture& texture, float x, float y);
+    ExploderEnemy(sf::Texture &texture, float x, float y);
 
-    void update(float dt, const sf::Vector2f& playerPos, std::vector<EnemyBullet>& bullets) override;
-    void draw(sf::RenderWindow& window) override;
+    void update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &bullets) override;
+    void draw(sf::RenderWindow &window) override;
 
 private:
     sf::Sprite sprite;
     bool active = true;
+    sf::Clock shootClock; // ✅ Add this line
 };
 
 // TurretEnemy class - shoots in a circular pattern every 2 seconds
-class TurretEnemy : public BaseEnemy {
+class TurretEnemy : public BaseEnemy
+{
 public:
-    TurretEnemy(sf::Texture& texture, float x, float y);
+    TurretEnemy(sf::Texture &texture, float x, float y);
 
-    void update(float dt, const sf::Vector2f& playerPos, std::vector<EnemyBullet>& bullets) override;
-    void draw(sf::RenderWindow& window) override;
+    void update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &bullets) override;
+    void draw(sf::RenderWindow &window) override;
 
 private:
     sf::Sprite sprite;
