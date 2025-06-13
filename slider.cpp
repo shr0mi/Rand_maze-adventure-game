@@ -1,13 +1,16 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include "option.hpp"
+#include "audio.hpp"
 
 int main()
 {
     sf::RenderWindow window(sf::VideoMode({800, 600}), "SFML Volume Slider");
     window.setFramerateLimit(60);
 
+    AudioManager audioManager;
     SliderVolume slider(200, 300, 400);
+    
 
     // sf::SoundBuffer buffer;
     // if (!buffer.loadFromFile("click-a.ogg")) return -1;
@@ -32,7 +35,19 @@ int main()
         while (const std::optional event = window.pollEvent())
         {
             if (event->is<sf::Event::Closed>())
+            {
                 window.close();
+            }
+            if (event->is<sf::Event::MouseButtonPressed>())
+            {
+                //auto mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
+                auto mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
+                if (musicButton.getGlobalBounds().contains(mousePos))
+                {
+                    audioManager.toggleMusic();
+                }
+            }
             slider.handleEvent(*event, window);
         }
 

@@ -7,8 +7,11 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "${file}",
+                //"${file}",
+                "menu.cpp",
                 "option.cpp",
+                "audio.cpp",
+                //"slider.cpp",
                 "-I\"C:/Users/USER/Documents/SFML-3.0.0/include\"",
                 "-DSFML_STATIC",
                 "-o",
