@@ -5,43 +5,44 @@
 #include <vector>
 #include <array>
 #include <memory>
-
+#include "enemy.hpp"
 
 
 class Player {
 public:
-    Player(sf::Texture& tex, int row, int col,std::vector<std::vector<int>> collisionMap);
+    Player(sf::Texture& tex, int row, int col, std::vector<std::vector<int>> collisionMap);
 
-
-
-    void update(float dt);
+     void update(float dt, std::vector<EnemyBullet>& enemyBullets);
     void draw(sf::RenderWindow& window);
     sf::Vector2f getPosition() const;
     sf::Vector2f getPosition();
-    sf::View getView() const;
+    //sf::View getView() const;
     sf::Vector2f cameraCenter;
-    bool cheatMode = false;
-    sf::View normalView;
-    sf::View mapView;
-    void handleCheatCode();
-    bool isCheatMode() const; 
-    
-
+    sf::View getCurrentView() const;  // returns cheat view if debugMode else normal view
+    void cheatlook(sf::RenderWindow& window, float dt);
+    bool isDebugModeEnabled() const { return debugMode; }
+    int gethealth();
 
 
 
 private:
     sf::Sprite sprite;
-    float speed = 300.f;
-
-     bool dashing = false;
-    float dashSpeed = 800.f;
-    float dashDuration = 0.1f;
-    float dashTimeLeft = 0.f;
-    sf::Vector2f dashDirection;
-    float dashCooldown = 100.0f;  
-    float dashCooldownTimer = 0.f;
+    float speed = 1000.f;
      float cameraLag = 4.0f;
+     bool debugMode = false;
+     bool keyOnePrev = false;
+     bool keyZeroPrev = false;
+    std::string cheatBuffer;
+    sf::Vector2f cheatCameraCenter;          // center for cheat mode camera
+    const sf::Vector2f normalViewSize{500.f, 500.f};  // your normal view size
+    const sf::Vector2f cheatViewSize{normalViewSize.x * 5.5f, normalViewSize.y * 5.5f}; // wider cheat view
+
+    int health = 4;
+    float invincibleTimer = 0.f;
+    const float INVINCIBLE_TIME = 1.0f; 
+
+    void checkBulletCollisions(std::vector<EnemyBullet>& enemyBullets);
+
 };
 
 
@@ -113,8 +114,6 @@ void handleKeyChestInteraction(std::vector<Key>& keys, Chest& chest, const sf::V
 
 
 #endif
-
-
 
 
 
