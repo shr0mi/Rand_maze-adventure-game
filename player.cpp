@@ -1,23 +1,104 @@
+#include <iostream>
 #include "player.h"
+#include "enemy.hpp"
 #include <cmath>
 #include <algorithm>
 
 constexpr float BULLET_COOLDOWN = 0.2f; // 5 bullets per second
 
-Player::Player(sf::Texture& tex, int row, int col)
-    : sprite(tex, sf::IntRect({col * 17, row * 17}, {16, 16})) {
-    sprite.setPosition({400.f, 300.f});
-    sprite.setScale({5.f,5.f});
+std::vector<std::vector<int>> collMap;
+
+Player::Player(sf::Texture& tex, int row, int col, std::vector<std::vector<int>> collisionMap)
+    : sprite(tex, sf::IntRect({col * 17, row * 17}, {17, 17})) {
+    sprite.setPosition({340.f, 340.f});
+    sprite.setScale({1.f,1.f});
+    collMap = collisionMap;
 }
 
-void Player::update(float dt) {
-    sf::Vector2f move(0.f, 0.f);
-    float speed = 400.f; // units per second — adjust as needed
+void Player::update(float dt,std::vector<EnemyBullet>& enemyBullets) {
+    if(debugMode) return;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up)) move.y -= 1.f;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down)) move.y += 1.f;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) move.x -= 1.f;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) move.x += 1.f;
+
+
+
+if (invincibleTimer > 0.f)
+    invincibleTimer -= dt;
+
+// 2. Collision detection with enemy bullets
+sf::FloatRect playerBounds = sprite.getGlobalBounds();
+
+for (auto& bullet : enemyBullets) {
+    if (bullet.shape.getGlobalBounds().findIntersection(playerBounds).has_value()) {
+        if (invincibleTimer <= 0.f) {
+            //health--;
+            invincibleTimer = INVINCIBLE_TIME;
+
+            std::cout << "Player hit! Health: " << health << "\n";
+        }
+        break; // Only one hit per frame
+    }
+}
+
+// 3. Respawn if health reaches zero
+if (health <= 0) {
+    health = 4; // Reset health
+    sprite.setPosition({340.f, 340.f}); // Respawn position
+    std::cout << "Player respawned\n";
+}
+
+
+
+    sf::Vector2f move(0.f, 0.f);
+    float speed = 200.f; // units per second — adjust as needed
+    
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)){ 
+        sf::Vector2f newPos = sprite.getPosition();
+        newPos.y += 8.f; newPos.x += 8.f;
+        int x = (int)(newPos.x/16), y = (int)((newPos.y - 8.5f)/16);
+
+        if(collMap[y][x] == 0){
+            move.y -= 1.f;
+        }
+        std::cerr << sprite.getPosition().x + 8.f << " " << sprite.getPosition().y + 8.f << std::endl;
+        std::cerr << x << " " << y << std::endl;
+        
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)){
+        sf::Vector2f newPos = sprite.getPosition();
+        newPos.y += 8.f; newPos.x += 8.f;
+        int x = (int)(newPos.x/16), y = (int)((newPos.y + 8.5f)/16);
+
+        if(collMap[y][x]==0){
+            move.y += 1.f;
+        }
+
+        std::cerr << sprite.getPosition().x + 8.f << " " << sprite.getPosition().y + 8.f << std::endl;
+        std::cerr << x << " " << y << std::endl;
+        
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)){ 
+        sf::Vector2f newPos = sprite.getPosition();
+        newPos.y += 8.f; newPos.x += 8.f;
+        int x = (int)((newPos.x - 8.5f)/16), y = (int)(newPos.y/16);
+        
+
+        if(collMap[y][x]==0){
+            move.x -= 1.f;
+        }
+
+        std::cerr << x << " " << y << std::endl;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)){
+        sf::Vector2f newPos = sprite.getPosition();
+        newPos.y += 8.f; newPos.x += 8.f;
+        int x = (int)((newPos.x + 8.5f)/16), y = (int)(newPos.y/16);
+
+        if(collMap[y][x]==0){
+            move.x += 1.f;
+        }
+
+        std::cerr << x << " " << y << std::endl;
+    }
 
     // Normalize movement
     if (move.x != 0.f || move.y != 0.f) {
@@ -26,11 +107,53 @@ void Player::update(float dt) {
         move *= speed * dt; // scale movement by speed and time
         sprite.move(move);  // apply movement
     }
+     cameraCenter += (sprite.getPosition() - cameraCenter) * cameraLag * dt; // interpolate camera
 }
 
 void Player::draw(sf::RenderWindow& window) {
     window.draw(sprite);
 }
+
+int Player::gethealth() {return health;}
+
+sf::View Player::getCurrentView() const {
+    sf::View view;
+    if (debugMode) {
+        view.setSize(cheatViewSize);
+        view.setCenter(cheatCameraCenter);
+    } else {
+        view.setSize(normalViewSize);
+        view.setCenter(cameraCenter);
+    }
+    return view;
+}
+
+void Player::cheatlook(sf::RenderWindow&, float dt) {
+    bool keyOneNow = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num1);
+    bool keyZeroNow = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num0);
+    bool bothNowPressed = keyOneNow && keyZeroNow;
+    bool bothPrevPressed = keyOnePrev && keyZeroPrev;
+
+    if (bothNowPressed && !bothPrevPressed) {
+        debugMode = !debugMode;
+        if (debugMode)
+            cheatCameraCenter = cameraCenter; // start cheat camera at player pos
+        std::cout << (debugMode ? "CHEAT MODE ENABLED\n" : "CHEAT MODE DISABLED\n");
+    }
+
+    keyOnePrev = keyOneNow;
+    keyZeroPrev = keyZeroNow;
+
+    if (debugMode) {
+        float speed = 1600.f * dt;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))  cheatCameraCenter.x -= speed;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) cheatCameraCenter.x += speed;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))    cheatCameraCenter.y -= speed;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))  cheatCameraCenter.y += speed;
+    }
+}
+
+
 
 sf::Vector2f Player::getPosition() const {
     return sprite.getPosition();
@@ -45,21 +168,22 @@ sf::Vector2f Player::getPosition() {
 Crosshair::Crosshair(sf::Texture& tex, int row, int col)
     : sprite(tex, sf::IntRect({col * 17, row * 17}, {16, 16})) {
     sprite.setPosition({300.f, 200.f});
-    sprite.setScale({3.f,3.f});
+    sprite.setScale({2.f,2.f});
 }
 
 void Crosshair::draw(sf::RenderWindow& window) {
     window.draw(sprite);
 }
 void Crosshair::update(const sf::RenderWindow& window) {
-    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+    sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+    mousePos.x -= 16.f; mousePos.y -= 16.f;
     sprite.setPosition(static_cast<sf::Vector2f>(mousePos));
 }
 
 Bullet::Bullet(sf::Texture& tex,const sf::Vector2f& startPos, const sf::Vector2f& targetPos,int row,int col)
  : sprite(tex, sf::IntRect({col * 17, row * 17}, {16, 16})){
     sprite.setPosition(startPos);
-    sprite.setScale({5.f,5.f});
+    sprite.setScale({1.f,1.f});
     sf::Vector2f direction = targetPos - startPos;
     float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
     if (length != 0)
@@ -95,9 +219,11 @@ void handleShooting(std::vector<Bullet>& bullets, sf::Texture& tex, const sf::Ve
         sf::Vector2i mousePixel = sf::Mouse::getPosition(window);
         sf::Vector2f mouseWorld = window.mapPixelToCoords(mousePixel);
 
-        sf::Vector2f playercenter = playerPos + sf::Vector2f(8.f, 8.f);
+        sf::Vector2f playercenter = playerPos;
 
-        bullets.emplace_back(tex, playercenter, mouseWorld, 4,22); // adjust sprite row/col
+        sf::Vector2f mousecenter = mouseWorld - sf::Vector2f(8.f,8.f);
+
+        bullets.emplace_back(tex, playercenter, mousecenter, 4,22); // adjust sprite row/col
         cooldownTimer = BULLET_COOLDOWN;
     }
 }
@@ -106,10 +232,6 @@ void updateBullets(std::vector<Bullet>& bullets, float dt, const sf::RenderWindo
     for (auto& bullet : bullets) {
         bullet.update(dt);
     }
-
-    bullets.erase(std::remove_if(bullets.begin(), bullets.end(),
-        [&](const Bullet& b) { return b.isOffScreen(window); }),
-        bullets.end());
 }
 
 Key::Key(sf::Texture& tex, sf::Vector2f position, int col, int row)
@@ -157,7 +279,6 @@ void Chest::tryOpen(const sf::Vector2f& playerPos, float radius, bool allKeysCol
 
      if (!opened && dist < radius && allKeysCollected) {
         opened = true;
-        // 🔁 Change to "opened" tile
         sprite.setTextureRect(sf::IntRect({9 * 17, 6 * 17}, {16, 16})); // Update to opened chest tile
     }
 }
@@ -176,8 +297,6 @@ void handleKeyChestInteraction(std::vector<Key>& keys, Chest& chest, const sf::V
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
         chest.tryOpen(playerPos, 55.0f, allCollected);
 }
-
-
 
 
 
