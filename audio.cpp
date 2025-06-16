@@ -40,3 +40,6 @@ void AudioManager::draw(sf::RenderWindow &window) const
     window.draw(iconSprite);
 }
 
+void AudioManager::setVolume(float volume) {
+    backgroundMusic.setVolume(volume);  // Volume is 0 to 100
+}

@@ -10,7 +10,6 @@ int main()
 
     AudioManager audioManager;
     SliderVolume slider(200, 100, 400);
-    
 
     // sf::SoundBuffer buffer;
     // if (!buffer.loadFromFile("click-a.ogg")) return -1;
@@ -40,7 +39,7 @@ int main()
             }
             if (event->is<sf::Event::MouseButtonPressed>())
             {
-                //auto mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
+                // auto mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
                 auto mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
                 if (musicButton.getGlobalBounds().contains(mousePos))
@@ -52,6 +51,8 @@ int main()
         }
 
         // sound.setVolume(slider.getVolume());
+        // 🔊 Set volume based on slider
+        audioManager.setVolume(slider.getVolume());
 
         window.clear(sf::Color::White);
         slider.draw(window);

@@ -9,7 +9,8 @@ public:
     void toggleMusic();
     void updateIconPosition(const sf::Vector2f &pos);
     void draw(sf::RenderWindow &window) const;
-    void handleClick(const sf::Vector2i &mousePos, const sf::RenderWindow &window);
+    void setVolume(float volume);
+    //void handleClick(const sf::Vector2i &mousePos, const sf::RenderWindow &window);
 
 private:
     sf::Music backgroundMusic;
