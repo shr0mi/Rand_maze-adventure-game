@@ -23,7 +23,7 @@ SliderVolume::SliderVolume(float x, float y, float width)
 
     // volumeText.setFont(font);
     // volumeText.setCharacterSize(18);
-    volumeText.setFillColor(sf::Color::White);
+    volumeText.setFillColor(sf::Color::Black);
     updateText();
 }
 

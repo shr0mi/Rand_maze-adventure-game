@@ -7,7 +7,7 @@
 int main()
 {
     // Create window
-    sf::RenderWindow window(sf::VideoMode({960, 540}), "Main Menu");
+    sf::RenderWindow window(sf::VideoMode({960, 540}), "Main Menu", sf::Style::None);
 
     // Load font
     sf::Font font("arial.ttf");

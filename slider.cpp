@@ -9,7 +9,7 @@ int main()
     window.setFramerateLimit(60);
 
     AudioManager audioManager;
-    SliderVolume slider(200, 300, 400);
+    SliderVolume slider(200, 100, 400);
     
 
     // sf::SoundBuffer buffer;
@@ -53,7 +53,7 @@ int main()
 
         // sound.setVolume(slider.getVolume());
 
-        window.clear(sf::Color::Black);
+        window.clear(sf::Color::White);
         slider.draw(window);
         window.draw(musicButton);
         window.display();
