@@ -60,7 +60,7 @@ int main()
     exitButton.setScale({0.3f, 0.3f});
 
     
-
+    bool isPaused = false;
     // While window is still open
     while (window.isOpen())
     {
@@ -88,6 +88,8 @@ int main()
 
                     window.close(); // Exit from main window
                     std::system("main.exe");
+
+                    
                     
                 }
                 else if (optionButton.getGlobalBounds().contains(mousePos))

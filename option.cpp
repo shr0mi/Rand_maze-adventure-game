@@ -17,19 +17,18 @@ SliderVolume::SliderVolume(float x, float y, float width)
     minX = x;
     maxX = x + width;
 
-    if (!font.openFromFile("arial.ttf")) {
-        // Fallback: just ignore text rendering
+    if (!font.openFromFile("arial.ttf"))
+    {
+        // Fallback: just ignore text rendering!
     }
 
-    // volumeText.setFont(font);
-    // volumeText.setCharacterSize(18);
-    volumeText.setFillColor(sf::Color::Black);
+    volumeText.setFillColor(sf::Color::White);
     updateText();
 }
 
-void SliderVolume::handleEvent(const sf::Event& event, const sf::RenderWindow& window)
+void SliderVolume::handleEvent(const sf::Event &event, const sf::RenderWindow &window)
 {
-    if (const auto* mousePressed = event.getIf<sf::Event::MouseButtonPressed>())
+    if (const auto *mousePressed = event.getIf<sf::Event::MouseButtonPressed>())
     {
         if (mousePressed->button == sf::Mouse::Button::Left)
         {
@@ -41,14 +40,14 @@ void SliderVolume::handleEvent(const sf::Event& event, const sf::RenderWindow& w
             }
         }
     }
-    else if (const auto* mouseReleased = event.getIf<sf::Event::MouseButtonReleased>())
+    else if (const auto *mouseReleased = event.getIf<sf::Event::MouseButtonReleased>())
     {
         if (mouseReleased->button == sf::Mouse::Button::Left)
         {
             isDragging = false;
         }
     }
-    else if (const auto* mouseMoved = event.getIf<sf::Event::MouseMoved>())
+    else if (const auto *mouseMoved = event.getIf<sf::Event::MouseMoved>())
     {
         if (isDragging)
         {
@@ -70,7 +69,6 @@ void SliderVolume::updateText()
     volumeText.setPosition({knob.getPosition().x, knob.getPosition().y - 20});
 }
 
-
 void SliderVolume::updateKnobPosition(float mouseX)
 {
     float x = std::clamp(mouseX, minX, maxX);
@@ -85,7 +83,7 @@ float SliderVolume::getVolume() const
     return volume;
 }
 
-void SliderVolume::draw(sf::RenderWindow& window) const
+void SliderVolume::draw(sf::RenderWindow &window) const
 {
     window.draw(bar);
     window.draw(knob);
