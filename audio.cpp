@@ -4,7 +4,7 @@
 #include <iostream>
 AudioManager::AudioManager() : iconSprite(iconTexture)
 {
-    if (!backgroundMusic.openFromFile("Preview.ogg"))
+    if (!backgroundMusic.openFromFile("One_Man_Symphony_In_The_Blink_Of_An_Eye_(Free)_02_An_Instant_Burst_(Action_02).mp3"))
     {
         std::cerr << "Failed to load music.\n";
     }
