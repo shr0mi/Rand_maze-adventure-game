@@ -12,7 +12,7 @@ class Player {
 public:
     Player(sf::Texture& tex, int row, int col, std::vector<std::vector<int>> collisionMap);
 
-     void update(float dt, std::vector<EnemyBullet>& enemyBullets);
+    void update(float dt, std::vector<EnemyBullet>& enemyBullets,sf::RenderWindow& window,std::vector<std::shared_ptr<BaseEnemy>> enemies);
     void draw(sf::RenderWindow& window);
     sf::Vector2f getPosition() const;
     sf::Vector2f getPosition();
@@ -22,12 +22,12 @@ public:
     void cheatlook(sf::RenderWindow& window, float dt);
     bool isDebugModeEnabled() const { return debugMode; }
     int gethealth();
+    
 
 
 
 private:
     sf::Sprite sprite;
-    float speed = 1000.f;
      float cameraLag = 4.0f;
      bool debugMode = false;
      bool keyOnePrev = false;
@@ -37,12 +37,11 @@ private:
     const sf::Vector2f normalViewSize{500.f, 500.f};  // your normal view size
     const sf::Vector2f cheatViewSize{normalViewSize.x * 5.5f, normalViewSize.y * 5.5f}; // wider cheat view
 
-    int health = 4;
-    float invincibleTimer = 0.f;
-    const float INVINCIBLE_TIME = 1.0f; 
+    int health = 15;
+    float invincibleTimer = 0.2f;
+    const float INVINCIBLE_TIME = 2.0f; 
 
     void checkBulletCollisions(std::vector<EnemyBullet>& enemyBullets);
-
 };
 
 
@@ -70,11 +69,13 @@ public:
     void draw(sf::RenderWindow& window) const;
     bool isOffScreen(const sf::RenderWindow& window) const;
     sf::FloatRect getBounds() const { return sprite.getGlobalBounds(); }
+    sf::Sprite sprite;
+    bool isAlive = true;
 
 
 
 private:
-    sf::Sprite sprite;
+   
     sf::Vector2f velocity;
 };
 
@@ -85,7 +86,7 @@ void updateBullets(std::vector<Bullet>& bullets, float dt, const sf::RenderWindo
 
 class Key {
 public:
-    Key(sf::Texture& texture, sf::Vector2f position,int col,int row);
+    Key(sf::Vector2f position);
     void draw(sf::RenderWindow& window) const;
     void checkCollision(const sf::Vector2f& playerPos, float radius);
     bool isCollected() const;
@@ -97,7 +98,8 @@ private:
 
 class Chest {
 public:
-    Chest(sf::Texture& texture, sf::Vector2f position);
+    Chest();
+    void setpos(sf::Vector2f position);
     void draw(sf::RenderWindow& window) const;
     void tryOpen(const sf::Vector2f& playerPos, float radius, bool allKeysCollected);
     bool isOpened() const;

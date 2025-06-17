@@ -86,8 +86,11 @@ void bsp(vector<vector<int>>& map, int x, int y, int W, int H){
 
         map[randNum(y + rand_room_shrink_y + 1, y + H - rand_room_shrink_y - 2)][randNum(x + rand_room_shrink_x + 1, x + W - rand_room_shrink_x - 2)] = -1;
         map[randNum(y + rand_room_shrink_y + 1, y + H - rand_room_shrink_y - 2)][randNum(x + rand_room_shrink_x + 1, x + W - rand_room_shrink_x - 2)] = -2;
-        map[randNum(y + rand_room_shrink_y + 1, y + H - rand_room_shrink_y - 2)][randNum(x + rand_room_shrink_x + 1, x + W - rand_room_shrink_x - 2)] = -3; 
-
+        map[randNum(y + rand_room_shrink_y + 1, y + H - rand_room_shrink_y - 2)][randNum(x + rand_room_shrink_x + 1, x + W - rand_room_shrink_x - 2)] = -3;
+        
+       
+        map[randNum(y + rand_room_shrink_y + 3, y + H - rand_room_shrink_y - 4)][randNum(x + rand_room_shrink_x + 3, x + W - rand_room_shrink_x - 4)] = -4;
+        map[randNum(y + rand_room_shrink_y + 3, y + H - rand_room_shrink_y - 4)][randNum(x + rand_room_shrink_x + 3, x + W - rand_room_shrink_x - 4)] = -5;
     }
 }
 

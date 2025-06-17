@@ -4,52 +4,150 @@
 #include <cmath>
 #include <algorithm>
 
-constexpr float BULLET_COOLDOWN = 0.2f; // 5 bullets per second
+bool disableshoot = false;
 
 std::vector<std::vector<int>> collMap;
-
+sf::Texture pltex;
 Player::Player(sf::Texture& tex, int row, int col, std::vector<std::vector<int>> collisionMap)
     : sprite(tex, sf::IntRect({col * 17, row * 17}, {17, 17})) {
     sprite.setPosition({340.f, 340.f});
     sprite.setScale({1.f,1.f});
     collMap = collisionMap;
+    pltex = tex;
 }
 
-void Player::update(float dt,std::vector<EnemyBullet>& enemyBullets) {
+void Player::update(float dt, std::vector<EnemyBullet>& enemyBullets,sf::RenderWindow& window,std::vector<std::shared_ptr<BaseEnemy>> enemies) {
     if(debugMode) return;
 
+    static bool isRespawning = false;
+    static float respawnTimer = 0.f;
+    static int countdownValue = 3;
+    static sf::IntRect playerNormalRect = sprite.getTextureRect();
+    static int flickerFrames = 0;
 
 
 
-if (invincibleTimer > 0.f)
-    invincibleTimer -= dt;
+    // === If respawning, handle countdown ===
+    if (isRespawning) {
+        disableshoot = true;
+        respawnTimer -= dt;
 
-// 2. Collision detection with enemy bullets
-sf::FloatRect playerBounds = sprite.getGlobalBounds();
+        if (respawnTimer <= 0.f) {
+            countdownValue--;
 
-for (auto& bullet : enemyBullets) {
-    if (bullet.shape.getGlobalBounds().findIntersection(playerBounds).has_value()) {
-        if (invincibleTimer <= 0.f) {
-            //health--;
-            invincibleTimer = INVINCIBLE_TIME;
+            if (countdownValue > 0) {
+                respawnTimer = 1.f;
+                int x = 0;
+                if (countdownValue == 2) x = 629;
+                else if (countdownValue == 1) x = 612;
+                int y = 289;
 
-            std::cout << "Player hit! Health: " << health << "\n";
+
+                sprite.setTextureRect(sf::IntRect({x, 289}, {16, 16}));
+                sprite.setScale({3.f,3.f});
+            } else {
+                // Respawn done
+                disableshoot = false;
+                isRespawning = false;
+                flickerFrames = 0;
+                health = 4;
+                sprite.setPosition({340.f, 340.f});
+                sprite.setTextureRect(playerNormalRect); // restore normal frame
+                sprite.setScale({1.f,1.f});
+                std::cout << "Player respawned\n";
+            }
         }
-        break; // Only one hit per frame
+
+        return; // Skip everything else while respawning
     }
+
+    // === Invincibility timer ===
+    if (invincibleTimer > 0.f)
+        invincibleTimer -= dt;
+
+    // === Bullet collision ===
+    sf::FloatRect playerBounds = sprite.getGlobalBounds();
+for (size_t i = 0; i < enemyBullets.size(); ++i) {
+if (enemyBullets[i].shape.getGlobalBounds().findIntersection(playerBounds).has_value()) {
+    if (invincibleTimer <= 0.f) {
+        invincibleTimer = INVINCIBLE_TIME;
+        health--;
+        std::cout << "Player hit! Health: " << health << "\n";
+
+        // Start flicker: 10 frames of invisibility
+        flickerFrames = 200;
+
+        enemyBullets.erase(enemyBullets.begin() + i);
+        break;
+    }
+}}
+
+ for (const auto& enemy : enemies) {
+        // Check if this enemy is an ExploderEnemy
+        ExploderEnemy* exploder = dynamic_cast<ExploderEnemy*>(enemy.get());
+        if (!exploder) continue;
+
+        // Get distance to player
+        sf::FloatRect ebounds = exploder->getBounds(); // assumes getPosition() exists
+
+        sf::Vector2f playerPosCenter(
+    playerBounds.position.x + playerBounds.size.x / 2.f,
+    playerBounds.position.y + playerBounds.size.y / 2.f
+);
+
+sf::Vector2f enemyPosCenter(
+    ebounds.position.x + ebounds.size.x / 2.f,
+    ebounds.position.y + ebounds.size.y / 2.f
+);
+
+sf::Vector2f toPlayer = playerPosCenter - enemyPosCenter;
+float distance = std::sqrt(toPlayer.x * toPlayer.x + toPlayer.y * toPlayer.y);
+
+
+
+        if (distance < 26.f) {
+            if (invincibleTimer <= 0.f) {
+                invincibleTimer = INVINCIBLE_TIME;
+                health -= 2;
+                std::cout << "Player hit! Health: " << health << "\n";
+                flickerFrames = 200;
+                break; // Only damage once
+            }
+        }
+    }
+
+if (flickerFrames > 0) {
+    flickerFrames--;
+    // Make sprite invisible
+    sprite.setColor(sf::Color(255, 0, 0, 255)); // Fully transparent
+} else {
+    // Restore full opacity
+    sprite.setColor(sf::Color(255, 255, 255, 255));
 }
 
-// 3. Respawn if health reaches zero
-if (health <= 0) {
-    health = 4; // Reset health
-    sprite.setPosition({340.f, 340.f}); // Respawn position
-    std::cout << "Player respawned\n";
-}
+
+
+
+
+
+    // === Start countdown on death ===
+    if (health <= 0 && !isRespawning) {
+        isRespawning = true;
+        countdownValue = 3;
+        respawnTimer = 1.f;
+
+        // Show "3" — assume it's at (64, 0) row, tile size 32×32
+        sprite.setTextureRect(sf::IntRect({646, 289}, {16, 16})); // "3" is at index 2
+        sprite.setScale({3.f,3.f});
+        sprite.setColor(sf::Color(255, 255, 255, 255));
+        std::cout << "Player dying... countdown begins\n";
+    }
+
 
 
 
     sf::Vector2f move(0.f, 0.f);
-    float speed = 200.f; // units per second — adjust as needed
+    float speed = 300.f; // units per second — adjust as needed
     
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)){ 
         sf::Vector2f newPos = sprite.getPosition();
@@ -209,35 +307,67 @@ bool Bullet::isOffScreen(const sf::RenderWindow& window) const {
 }
 
 void handleShooting(std::vector<Bullet>& bullets, sf::Texture& tex, const sf::Vector2f& playerPos, const sf::RenderWindow& window) {
-    static float cooldownTimer = 0.f;
-    static sf::Clock shootClock;
+    if (disableshoot) return;
 
-    float dt = shootClock.restart().asSeconds();
-    cooldownTimer -= dt;
+    static bool wasMousePressed = false;
 
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && cooldownTimer <= 0.f) {
+    bool isMousePressed = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
+
+    if (isMousePressed && !wasMousePressed) {
+        // Just clicked this frame (mouse down event)
+
         sf::Vector2i mousePixel = sf::Mouse::getPosition(window);
         sf::Vector2f mouseWorld = window.mapPixelToCoords(mousePixel);
 
         sf::Vector2f playercenter = playerPos;
+        sf::Vector2f mousecenter = mouseWorld - sf::Vector2f(8.f, 8.f);
 
-        sf::Vector2f mousecenter = mouseWorld - sf::Vector2f(8.f,8.f);
-
-        bullets.emplace_back(tex, playercenter, mousecenter, 4,22); // adjust sprite row/col
-        cooldownTimer = BULLET_COOLDOWN;
+        bullets.emplace_back(tex, playercenter, mousecenter, 4, 22); // adjust sprite row/col
     }
+
+    // Update mouse state for next frame
+    wasMousePressed = isMousePressed;
 }
 
-void updateBullets(std::vector<Bullet>& bullets, float dt, const sf::RenderWindow& window) {
+/*void updateBullets(std::vector<Bullet>& bullets, float dt, const sf::RenderWindow& window) {
     for (auto& bullet : bullets) {
         bullet.update(dt);
     }
+}*/
+
+void updateBullets(std::vector<Bullet>& bullets, float dt, const sf::RenderWindow& window) {
+    for (size_t i = 0; i < bullets.size(); ) {
+        bullets[i].update(dt);
+
+        // Get bullet position from sprite
+        sf::Vector2f pos = bullets[i].sprite.getPosition();
+        int col = static_cast<int>(pos.x) / 16;
+        int row = static_cast<int>(pos.y) / 16;
+
+        // Check collision with map
+        if (row >= 0 && row < (int)collMap.size() &&
+            col >= 0 && col < (int)collMap[0].size()) {
+            if (collMap[row][col] == 1) {
+                bullets[i].isAlive = false;
+            }
+        } else {
+            bullets[i].isAlive = false; // Out of bounds
+        }
+
+        // Remove dead bullet
+        if (!bullets[i].isAlive) {
+            bullets.erase(bullets.begin() + i);
+        } else {
+            ++i;
+        }
+    }
 }
 
-Key::Key(sf::Texture& tex, sf::Vector2f position, int col, int row)
-    : sprite(tex, sf::IntRect({col * 17, row * 17}, {16, 16})) {
+
+Key::Key(sf::Vector2f position)
+    : sprite(pltex, sf::IntRect({32 * 17, 11 * 17}, {16, 16})) {
     sprite.setPosition(position);
-    sprite.setScale({3.f,3.f});
+    sprite.setScale({1.f,1.f});
 }
 
 
@@ -261,11 +391,17 @@ bool Key::isCollected() const {
 }
 
 
-Chest::Chest(sf::Texture& texture, sf::Vector2f position)
- : sprite(texture, sf::IntRect({8 * 17, 6 * 17}, {16, 16})) {
-    sprite.setPosition(position);
-    sprite.setScale({6.f,6.f});
+Chest::Chest()
+ : sprite(pltex, sf::IntRect({10 * 17, 6 * 17}, {16, 16})) {
+    sprite.setScale({1.f,1.f});
 }
+
+void Chest::setpos(sf::Vector2f position) {
+    sprite.setPosition(position);
+}
+
+
+
 
 void Chest::draw(sf::RenderWindow& window) const {
         window.draw(sprite);
@@ -279,7 +415,9 @@ void Chest::tryOpen(const sf::Vector2f& playerPos, float radius, bool allKeysCol
 
      if (!opened && dist < radius && allKeysCollected) {
         opened = true;
-        sprite.setTextureRect(sf::IntRect({9 * 17, 6 * 17}, {16, 16})); // Update to opened chest tile
+        sprite.setTextureRect(sf::IntRect({11 * 17, 6 * 17}, {16, 16}));
+        sprite.setColor(sf::Color::Yellow); // Update to opened chest tile
+
     }
 }
 
@@ -289,7 +427,7 @@ bool Chest::isOpened() const {
 
 void handleKeyChestInteraction(std::vector<Key>& keys, Chest& chest, const sf::Vector2f& playerPos) {
     for (auto& key : keys)
-        key.checkCollision(playerPos, 55.0f);
+        key.checkCollision(playerPos, 10.0f);
 
     bool allCollected = std::all_of(keys.begin(), keys.end(),
                                     [](const Key& k){ return k.isCollected(); });
