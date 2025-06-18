@@ -1,5 +1,6 @@
 #include "enemy.hpp"
 //: sprite(tex, sf::IntRect({col * 17, row * 17}, {16, 16}))
+
 ShooterEnemy::ShooterEnemy(sf::Texture &tex, float x, float y)
     : sprite(tex, sf::IntRect({(19 - 1) * 17, (9 - 1) * 17}, {16, 16}))
 {
@@ -21,6 +22,17 @@ void ShooterEnemy::update(float dt, const sf::Vector2f &playerPos, std::vector<E
             shootClock.restart();
         }
     }
+    // if (recentlyDamaged && damageClock.getElapsedTime().asSeconds() > 0.2f) {
+    // sprite.setColor(sf::Color::White); // <-- Changed color reset
+    // recentlyDamaged = false;
+    // Changed: revert color to white after 0.2s if damaged
+if (recentlyDamaged && damageClock.getElapsedTime().asSeconds() > 0.2f) {
+    sprite.setColor(sf::Color::White); // <-- Changed color reset
+    recentlyDamaged = false;
+}
+
+
+
 }
 
 void ShooterEnemy::draw(sf::RenderWindow &window)
@@ -33,6 +45,9 @@ bool ShooterEnemy::isAlive() const {
 
 void ShooterEnemy::takeDamage(int amount) {
     health -= amount;
+    sprite.setColor(sf::Color::Red); // <-- Changed color on hit
+    damageClock.restart();           // <-- Changed for color timing
+    recentlyDamaged = true;          // <-- Changed for color tracking
 }
 
 sf::FloatRect ShooterEnemy::getBounds() const {
@@ -101,6 +116,11 @@ void ExploderEnemy::update(float dt, const sf::Vector2f &playerPos, std::vector<
         chasing = false;
         sprite.setTextureRect(sf::IntRect({(19 - 1) * 17, (8 - 1) * 17}, {16, 16}));
     }
+    // === Revert color after damage ===
+    if (recentlyDamaged && damageClock.getElapsedTime().asSeconds() > 0.2f) {
+        sprite.setColor(sf::Color::White); // <-- Changed color reset
+        recentlyDamaged = false;
+    }
 }
 
 void ExploderEnemy::draw(sf::RenderWindow &window)
@@ -120,6 +140,10 @@ bool ExploderEnemy::isAlive() const {
 
 void ExploderEnemy::takeDamage(int amount) {
     health -= amount;
+     sprite.setColor(sf::Color::Red); // <-- Changed color on hit
+    damageClock.restart();           // <-- Changed for color timing
+    recentlyDamaged = true;          // <-- Changed for color tracking
+
     if (health <= 0) {
         active = false;
         sprite.setColor(sf::Color::Transparent); // hide
@@ -154,6 +178,11 @@ void TurretEnemy::update(float dt, const sf::Vector2f &, std::vector<EnemyBullet
 
         shootClock.restart();
     }
+    // === Revert color after damage ===
+    if (recentlyDamaged && damageClock.getElapsedTime().asSeconds() > 0.2f) {
+        sprite.setColor(sf::Color::White); // <-- Changed color reset
+        recentlyDamaged = false;
+    }
 }
 
 void TurretEnemy::draw(sf::RenderWindow &window)
@@ -166,6 +195,9 @@ bool TurretEnemy::isAlive() const {
 
 void TurretEnemy::takeDamage(int amount) {
     health -= amount;
+    sprite.setColor(sf::Color::Red); // <-- Changed color on hit
+    damageClock.restart();           // <-- Changed for color timing
+    recentlyDamaged = true;          // <-- Changed for color tracking
 }
 
 sf::FloatRect TurretEnemy::getBounds() const {

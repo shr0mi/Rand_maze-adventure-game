@@ -4,11 +4,12 @@
 #include <cmath>
 
 constexpr float PLAYER_SPEED = 100.0f;
-constexpr float ENEMY_SPEED = 60.0f;
+constexpr float ENEMY_SPEED = 100.0f;
 constexpr float SHOOT_RANGE = 100.0f;
-constexpr float EXPLODE_RANGE = 50.0f;
+constexpr float Ss_speed = 200.f;
+constexpr float EXPLODE_RANGE = 25.0f;
 constexpr float BULLET_SPEED = 150.0f;
-constexpr float CHASE_RANGE = 200.0f; // Enemy chases player within 200 pixels
+constexpr float CHASE_RANGE = 250.0f; // Enemy chases player within 200 pixels
 
 // Normalize helper
 inline sf::Vector2f normalize(sf::Vector2f v)
@@ -105,6 +106,8 @@ private:
 
     sf::Sprite sprite;
     sf::Clock shootClock;
+      sf::Clock damageClock;
+    bool recentlyDamaged = false;
 };
 
 // ExploderEnemy class
@@ -170,6 +173,8 @@ private:
     bool active = true;
     bool chasing = false;
     sf::Clock shootClock;
+      sf::Clock damageClock;
+    bool recentlyDamaged = false;
 };
 
 // TurretEnemy class - shoots in a circular pattern every 2 seconds
@@ -190,4 +195,6 @@ private:
     sf::Clock shootClock;
     const float shootInterval = 2.0f;
     const int bulletCount = 12; // how many bullets per burst
+      sf::Clock damageClock;
+    bool recentlyDamaged = false;
 };

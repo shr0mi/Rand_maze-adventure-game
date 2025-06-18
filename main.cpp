@@ -5,9 +5,11 @@
 #include "enemy.hpp"
 #include "bsp_algorithm.h"
 #include<optional>
-std::vector<std::unique_ptr<BaseEnemy>> enemies;
+std::vector<std::shared_ptr<BaseEnemy>> enemies;
 sf::Texture texture;
-
+std::vector<Key> keys;
+Chest chest;
+int kcount = 3;int chcount = 1;
 std::vector<std::vector<int>> generateCollisionMap(std::vector<std::vector<int>> &level)
 {
     std::vector<std::vector<int>> collisionMap(level.size(), std::vector<int>(level[0].size(), 0));
@@ -26,17 +28,29 @@ std::vector<std::vector<int>> generateCollisionMap(std::vector<std::vector<int>>
 
             if (level[i][j] == -1)
             {
-                enemies.push_back(std::make_unique<ExploderEnemy>(texture, j * 16.f, i * 16.f));
+                enemies.push_back(std::make_shared<ExploderEnemy>(texture, j * 16.f, i * 16.f));
+            
             }
             else if (level[i][j] == -2)
             {
-                enemies.push_back(std::make_unique<TurretEnemy>(texture, j * 16.f, i * 16.f));
+                enemies.push_back(std::make_shared<TurretEnemy>(texture, j * 16.f, i * 16.f));
             }
             else if (level[i][j] == -3)
             {
-                enemies.push_back(std::make_unique<ShooterEnemy>(texture, j * 16.f, i * 16.f));
+                enemies.push_back(std::make_shared<ShooterEnemy>(texture, j * 16.f, i * 16.f));
             }
-            // std::cout << collisionMap[i][j] << " ";
+            else if(level[i][j] == -4 && kcount)
+            {
+            Key k({ j * 16.f, i * 16.f});
+                keys.push_back(k);
+                kcount--;
+                
+
+            }
+            else if(level[i][j] == -5 && chcount){
+                chest.setpos({ j * 16.f, i * 16.f});
+                chcount--;
+            }
         }
         // std::cout << std::endl;
     }
@@ -65,9 +79,10 @@ int main()
 
     Player player(texture, 3, 24, collisionMap);
     Crosshair crosshair(texture, 14, 21);
-    std::vector<Bullet> bullets;
+    
 
     sf::Clock clock;
+    sf::Clock timerclock;
 
     // Render Tilemap
     TileMap map;
@@ -76,10 +91,8 @@ int main()
         std::cerr << "Failed to load tilemap!" << std::endl;
         return -1;
     }
-
-    // Bullet handling
-    std::vector<Bullet> playerBullets;
     std::vector<EnemyBullet> enemyBullets;
+    std::vector<Bullet> playerBullets;
 
     // --- Enemies ---
 
@@ -123,7 +136,7 @@ int main()
                 ++it;
         }
 
-        handleShooting(playerBullets, texture, player.getPosition(), window);
+         handleShooting(playerBullets, texture, player.getPosition(), window);
         updateBullets(playerBullets, dt, window);
         for (auto it = playerBullets.begin(); it != playerBullets.end();)
         {
@@ -146,15 +159,16 @@ int main()
 
         enemies.erase(
             std::remove_if(enemies.begin(), enemies.end(),
-                           [](const std::unique_ptr<BaseEnemy> &e)
+                           [](const std::shared_ptr<BaseEnemy> &e)
                            {
                                return !e->isAlive();
                            }),
             enemies.end());
 
-        player.update(dt, enemyBullets);
+        player.update(dt, enemyBullets,window,enemies);
 
         crosshair.update(window);
+        handleKeyChestInteraction(keys, chest, player.getPosition());
         window.clear();
         window.setView(player.getCurrentView());
 
@@ -170,6 +184,22 @@ int main()
 
         for (auto &eBullet : enemyBullets)
             window.draw(eBullet.shape);
+
+        for (auto &ky : keys)
+            ky.draw(window);
+
+        chest.draw(window);    
+
+         float elapsedTime = timerclock.getElapsedTime().asSeconds();
+
+        // Convert to string
+        int km = 0;
+        for(auto &kys:keys){if(kys.isCollected()) km++;}
+        std::stringstream title;
+        title << "Timer: " << static_cast<int>(elapsedTime) << "s" <<"  Keys Collected: "<< km;
+
+        // Set window title
+        if(!chest.isOpened()) window.setTitle(title.str());
 
         window.display();
     }
