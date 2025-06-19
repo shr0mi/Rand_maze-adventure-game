@@ -76,6 +76,11 @@ int main()
                 }
                 if (creditButton.getGlobalBounds().contains(mousePos))
                 {
+                    if (isToggled)
+                    {
+                        audioManager.toggleMusic(); // Ensure it's stopped
+                        isToggled = false;
+                    }
                     window.close(); // Close the options window
                     std::system("credits.exe");
                 }
