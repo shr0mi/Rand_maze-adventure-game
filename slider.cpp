@@ -14,21 +14,21 @@ int main()
         return -1; // Error if images not found
     }
 
-    //Menu Image
+    // Menu Image
     sf::Sprite menuImage(menubgTexture);
-    menuImage.setPosition({-100, 50}); 
+    menuImage.setPosition({-100, 50});
     menuImage.setScale({1.3f, 1.3f});
 
     sf::Sprite optionImage(optionTexture);
-    optionImage.setPosition({210, 50}); 
+    optionImage.setPosition({210, 50});
     optionImage.setScale({0.2f, 0.2f});
 
     sf::Sprite musicbtnImage(musicbtnTexture);
-    musicbtnImage.setPosition({250, 300}); 
+    musicbtnImage.setPosition({250, 300});
     musicbtnImage.setScale({0.2f, 0.2f});
 
     sf::Sprite musicbtnoffImage(musicbtnoffTexture);
-    musicbtnoffImage.setPosition({250, 300}); 
+    musicbtnoffImage.setPosition({250, 300});
     musicbtnoffImage.setScale({0.2f, 0.2f});
 
     sf::Sprite creditButton(creditTexture);
@@ -74,6 +74,21 @@ int main()
                     audioManager.toggleMusic();
                     isToggled = !isToggled; // Toggle the state
                 }
+                if (creditButton.getGlobalBounds().contains(mousePos))
+                {
+                    window.close(); // Close the options window
+                    std::system("credits.exe");
+                }
+                if (backButton.getGlobalBounds().contains(mousePos))
+                {
+                    if (isToggled)
+                    {
+                        audioManager.toggleMusic(); // Ensure it's stopped
+                        isToggled = false;
+                    }
+                    window.close();          // Close the options window
+                    std::system("menu.exe"); // Open main menu
+                }
             }
             slider.handleEvent(*event, window);
         }
@@ -96,7 +111,7 @@ int main()
         window.draw(backButton);
         slider.draw(window);
         window.draw(musicButton);
-        
+
         window.display();
     }
 

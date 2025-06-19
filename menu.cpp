@@ -89,8 +89,6 @@ int main()
                     window.close(); // Exit from main window
                     std::system("main.exe");
 
-                    
-                    
                 }
                 else if (optionButton.getGlobalBounds().contains(mousePos))
                 {
