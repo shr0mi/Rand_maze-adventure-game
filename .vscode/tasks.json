@@ -7,10 +7,11 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                // "${file}",
-                "menu.cpp",
+                //"${file}",
+                // "menu.cpp",
                 "option.cpp",
                 "audio.cpp",
+                "pausemenu.cpp",
                 //"credits.cpp",
                 //"slider.cpp",
                 "-I\"C:/Users/USER/Documents/SFML-3.0.0/include\"",
@@ -18,6 +19,13 @@
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe",
                 "-L\"C:/Users/USER/Documents/SFML-3.0.0/lib\"",
+                
+                // "-IC:/C++ Libraries/SFML-3.0.0/include",
+                // "-DSFML_STATIC",
+                // "-o",
+                // "${fileDirname}\main.exe",
+                // "-LC:/C++ Libraries/SFML-3.0.0/lib",
+
                 "-lsfml-graphics-s",
                 "-lsfml-window-s",
                 "-lsfml-audio-s",
