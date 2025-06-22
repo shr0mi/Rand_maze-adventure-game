@@ -109,7 +109,7 @@ OptionsScreen::OptionsScreen() : bgTexture("assets/menubg.png"),
     creditsButton.setPosition({1300, 250});
     creditsButton.setScale({0.2f, 0.2f});
 
-    musicButton.setPosition({250, 300});
+    musicButton.setPosition({1300, 100});
     musicButton.setScale({0.2f, 0.2f});
 }
 
