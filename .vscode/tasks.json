@@ -7,7 +7,8 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "${file}",
+                //"${file}",
+                "main_menu.cpp",
                 "menu.cpp",
                 "view_manager.cpp",
                 "options.cpp",

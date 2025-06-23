@@ -89,28 +89,42 @@ void SliderVolume::draw(sf::RenderWindow &window) const
 }
 
 OptionsScreen::OptionsScreen() : bgTexture("assets/menubg.png"),
+                                 optionTexture("assets/ui_options_title.png"),
+                                 musicTexture("assets/musicbtn.png"),
                                  backTexture("assets/backbtn.png"),
                                  creditsTexture("assets/ui_credits_btn.png"),
                                  musicOnTexture("assets/ui_music_btn_on.png"),
                                  musicOffTexture("assets/ui_music_btn_off.png"),
 
                                  background(bgTexture),
+                                 optionImage(optionTexture),
+                                 musicImage(musicTexture),
                                  backButton(backTexture),
                                  creditsButton(creditsTexture),
-                                 musicButton(musicOnTexture),
+                                 musicOnButton(musicOnTexture),
+                                 musicOffButton(musicOffTexture),
 
-                                 slider(1150, 150, 200)
+                                 slider(1250, 150, 400)
 {
     background.setPosition({960, 0});
 
-    backButton.setPosition({1300, 400});
+    optionImage.setPosition({1250, 10});
+    optionImage.setScale({0.2f, 0.2f});
+
+    musicImage.setPosition({1150, 115});
+    musicImage.setScale({0.3f, 0.3f});
+
+    backButton.setPosition({1350, 400});
     backButton.setScale({0.3f, 0.3f});
 
-    creditsButton.setPosition({1300, 250});
+    creditsButton.setPosition({1350, 300});
     creditsButton.setScale({0.2f, 0.2f});
 
-    musicButton.setPosition({1300, 100});
-    musicButton.setScale({0.2f, 0.2f});
+    musicOnButton.setPosition({1300, 200});
+    musicOnButton.setScale({0.2f, 0.2f});
+
+    musicOffButton.setPosition({1300, 200});
+    musicOffButton.setScale({0.2f, 0.2f});
 }
 
 void OptionsScreen::handleEvent(const sf::Event &event, const sf::RenderWindow &window, AudioManager &audioManager)
@@ -121,11 +135,10 @@ void OptionsScreen::handleEvent(const sf::Event &event, const sf::RenderWindow &
     if (event.is<sf::Event::MouseButtonPressed>())
     {
         sf::Vector2f pos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-        if (musicButton.getGlobalBounds().contains(pos))
+        if (musicOnButton.getGlobalBounds().contains(pos))
         {
             audioManager.toggleMusic();
             musicOn = !musicOn;
-            musicButton.setTexture(musicOn ? musicOnTexture : musicOffTexture);
         }
     }
 }
@@ -143,8 +156,17 @@ bool OptionsScreen::creditsClicked(sf::Vector2f pos)
 void OptionsScreen::draw(sf::RenderWindow &window)
 {
     window.draw(background);
+    window.draw(optionImage);
+    window.draw(musicImage);
     window.draw(creditsButton);
     window.draw(backButton);
-    window.draw(musicButton);
+    if (musicOn)
+    {
+        window.draw(musicOnButton);
+    }
+    else
+    {
+        window.draw(musicOffButton);
+    }
     slider.draw(window);
 }

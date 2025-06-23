@@ -39,8 +39,8 @@ public:
     bool creditsClicked(sf::Vector2f pos);
 
 private:
-    sf::Texture bgTexture, backTexture, creditsTexture, musicOnTexture, musicOffTexture;
-    sf::Sprite background, backButton, creditsButton, musicButton;
+    sf::Texture bgTexture, optionTexture, musicTexture, backTexture, creditsTexture, musicOnTexture, musicOffTexture;
+    sf::Sprite background, optionImage, musicImage, backButton, creditsButton, musicOnButton, musicOffButton;
     bool musicOn = true;
     SliderVolume slider;
 };
