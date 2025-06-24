@@ -13,7 +13,5 @@ public:
 
 private:
     sf::Music backgroundMusic;
-    sf::Texture iconTexture;
-    sf::Sprite iconSprite;
     bool musicOn = true;
 };
