@@ -5,7 +5,7 @@
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode({800, 800}), "SFML Volume Slider");
+    sf::RenderWindow window(sf::VideoMode({800, 800}), "Pause Menu");
     window.setFramerateLimit(60);
 
     sf::Texture pauseTexture, menubgTexture, musicbtnTexture, musicbtnoffTexture, menuTexture, resumeTexture;
