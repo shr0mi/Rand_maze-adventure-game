@@ -10,9 +10,10 @@
 
 class Player {
 public:
-    Player(sf::Texture& tex, int row, int col, std::vector<std::vector<int>> collisionMap);
+    Player(sf::Texture& tex,std::vector<std::vector<int>> collisionMap);
+    void setPos(sf::Vector2f pos);
 
-    void update(float dt, std::vector<EnemyBullet>& enemyBullets,sf::RenderWindow& window,std::vector<std::shared_ptr<BaseEnemy>> enemies);
+    void update(float dt, std::vector<EnemyBullet>& enemyBullets,sf::RenderWindow& window,std::vector<std::shared_ptr<BaseEnemy>> enemies,sf::Vector2f pos,sf::FloatRect bossbounds,bool open);
     void draw(sf::RenderWindow& window);
     sf::Vector2f getPosition() const;
     sf::Vector2f getPosition();
@@ -35,9 +36,9 @@ private:
     std::string cheatBuffer;
     sf::Vector2f cheatCameraCenter;          // center for cheat mode camera
     const sf::Vector2f normalViewSize{500.f, 500.f};  // your normal view size
-    const sf::Vector2f cheatViewSize{normalViewSize.x * 5.5f, normalViewSize.y * 5.5f}; // wider cheat view
+    const sf::Vector2f cheatViewSize{normalViewSize.x * 3.5f, normalViewSize.y * 3.5f}; // wider cheat view
 
-    int health = 15;
+    int health = 20;
     float invincibleTimer = 0.2f;
     const float INVINCIBLE_TIME = 2.0f; 
 
@@ -47,7 +48,7 @@ private:
 
 class Crosshair {
 public:
-    Crosshair(sf::Texture& tex,int row,int col);
+    Crosshair();
 
     void draw(sf::RenderWindow& window);
     void update(const sf::RenderWindow& window);
@@ -63,7 +64,7 @@ private:
 
 class Bullet {
 public:
-    Bullet(sf::Texture& tex,const sf::Vector2f& startPos, const sf::Vector2f& targetPos,int row,int col);
+    Bullet(const sf::Vector2f& startPos, const sf::Vector2f& targetPos);
 
     void update(float deltaTime);
     void draw(sf::RenderWindow& window) const;
@@ -102,6 +103,7 @@ public:
     void setpos(sf::Vector2f position);
     void draw(sf::RenderWindow& window) const;
     void tryOpen(const sf::Vector2f& playerPos, float radius, bool allKeysCollected);
+    bool allKeysCollected(const std::vector<Key>& keys);
     bool isOpened() const;
 
 private:
@@ -111,9 +113,35 @@ private:
 
 void handleKeyChestInteraction(std::vector<Key>& keys, Chest& chest, const sf::Vector2f& playerPos);
 
+class Boss {
+    public:
 
+    Boss();
+    void setpos(sf::Vector2f position);
+    void draw(sf::RenderWindow& window) const;
+    void update(float dt,sf::RenderWindow& window,std::vector<Bullet>& playerBullets, std::vector<EnemyBullet>& enemyBullets);
+    sf::FloatRect getBounds() const;
 
+    private:
+    sf::Sprite sprite;
+    sf::Vector2f velocity;
+    int health = 40;
+    bool angry = false;
+    bool defeated = false;
+    float shootCooldown = 0.5f;
+    float timeSinceLastShot = 0.f; 
+    float deathTimer = 0.f;
+    float normalspeed = 100.f;
+    float angryspeed = 200.f;
+    float hitFlashTimer = 0.f;    // counts time since last hit
+    const float hitFlashDuration = 0.1f; // flash duration in seconds
+    bool isVisible = true;        // whether to draw the sprite
 
+    void handlePlayerBulletCollision(std::vector<Bullet>& playerBullets);
+    void handleWallBounce(float dt,std::vector<EnemyBullet>& enemyBullets);
+    bool checkWallCollision(const sf::FloatRect& bounds);
+
+};
 
 #endif
 
