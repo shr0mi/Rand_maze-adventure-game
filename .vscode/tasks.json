@@ -7,7 +7,16 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "${file}",
+                //"${file}",
+                "main.cpp",
+                "bsp_algorithm.cpp",
+                "enemy.cpp",
+                "mapgen.cpp",
+                "player.cpp",
+                "pause.cpp",
+                "audio.cpp",
+                "options.cpp",
+
                 // "main_menu.cpp",
                 // "menu.cpp",
                 // "view_manager.cpp",
@@ -16,8 +25,8 @@
                 // "audio.cpp",
 
                 // // "menu.cpp",
-                "option.cpp",
-                "audio.cpp",
+                // "option.cpp",
+                // "audio.cpp",
                 // "pausemenu.cpp",
                 // //"credits.cpp",
                 // //"slider.cpp",
