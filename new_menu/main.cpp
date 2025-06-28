@@ -4,10 +4,12 @@
 #include "player.h"
 #include "enemy.hpp"
 #include "bsp_algorithm.h"
+#include "timer.h" // timer header
 #include "pause.hpp" // pause menu
 #include "options.hpp"
 #include "audio.hpp"
 
+GameTimer gameTimer;
 PauseMenu pauseMenu;
 AudioManager audioManager;
 
@@ -122,6 +124,7 @@ int main()
         }
 
         float dt = clock.restart().asSeconds();
+        gameTimer.update(dt, isPaused);
 
         if (!isPaused)
         {
@@ -143,6 +146,7 @@ int main()
         window.draw(map);
         player.draw(window);
         crosshair.draw(window);
+        gameTimer.draw(window);
 
         for (auto &bullet : playerBullets)
             bullet.draw(window);

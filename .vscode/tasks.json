@@ -16,6 +16,7 @@
                 "pause.cpp",
                 "audio.cpp",
                 "options.cpp",
+                "timer.cpp",
 
                 // "main_menu.cpp",
                 // "menu.cpp",
