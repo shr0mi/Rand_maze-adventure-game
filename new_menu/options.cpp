@@ -1,4 +1,5 @@
 #include "options.hpp"
+#include "audio.hpp"
 
 SliderVolume::SliderVolume(float x, float y, float width)
     : isDragging(false), volumeText(font, "", 18)
@@ -21,6 +22,12 @@ SliderVolume::SliderVolume(float x, float y, float width)
     }
 
     volumeText.setFillColor(sf::Color::White);
+
+    // Initial knob position to match default volume
+    float defaultVolume = 20.f;
+    float initialX = minX + (defaultVolume / 100.f) * (maxX - minX);
+    knob.setPosition({initialX, y + bar.getSize().y / 2});
+
     updateText();
 }
 
@@ -72,6 +79,11 @@ void SliderVolume::updateKnobPosition(float mouseX)
     float x = std::clamp(mouseX, minX, maxX);
     knob.setPosition({x, bar.getPosition().y + bar.getSize().y / 2});
     updateText();
+
+    if (audio)
+    {
+        audio->setVolume(getVolume());
+    }
 }
 
 float SliderVolume::getVolume() const
@@ -81,6 +93,14 @@ float SliderVolume::getVolume() const
     return volume;
 }
 
+void SliderVolume::setVolume(float volume)
+{
+    float x = minX + (std::clamp(volume, 0.f, 100.f) / 100.f) * (maxX - minX);
+    knob.setPosition({x, bar.getPosition().y + bar.getSize().y / 2});
+    updateText();
+}
+
+
 void SliderVolume::draw(sf::RenderWindow &window) const
 {
     window.draw(bar);
@@ -88,7 +108,7 @@ void SliderVolume::draw(sf::RenderWindow &window) const
     window.draw(volumeText);
 }
 
-OptionsScreen::OptionsScreen() : bgTexture("assets/menubg.png"),
+OptionsScreen::OptionsScreen(AudioManager &audioManager) : bgTexture("assets/menubg.png"),
                                  optionTexture("assets/ui_options_title.png"),
                                  musicTexture("assets/musicbtn.png"),
                                  backTexture("assets/backbtn.png"),
@@ -125,7 +145,20 @@ OptionsScreen::OptionsScreen() : bgTexture("assets/menubg.png"),
 
     musicOffButton.setPosition({1300, 200});
     musicOffButton.setScale({0.2f, 0.2f});
+
+    slider.setAudioManager(&audioManager);
+
+    this->audio = &audioManager;
 }
+
+void OptionsScreen::syncWithAudio()
+{
+    if (audio)
+    {
+        slider.setVolume(audio->getVolume());
+    }
+}
+
 
 void OptionsScreen::handleEvent(const sf::Event &event, const sf::RenderWindow &window, AudioManager &audioManager)
 {
@@ -135,10 +168,10 @@ void OptionsScreen::handleEvent(const sf::Event &event, const sf::RenderWindow &
     if (event.is<sf::Event::MouseButtonPressed>())
     {
         sf::Vector2f pos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-        if (musicOnButton.getGlobalBounds().contains(pos))
+        if (musicOnButton.getGlobalBounds().contains(pos) || musicOffButton.getGlobalBounds().contains(pos))
         {
             audioManager.toggleMusic();
-            musicOn = !musicOn;
+            syncWithAudio();  // Update slider and toggle display
         }
     }
 }
@@ -160,7 +193,8 @@ void OptionsScreen::draw(sf::RenderWindow &window)
     window.draw(musicImage);
     window.draw(creditsButton);
     window.draw(backButton);
-    if (musicOn)
+
+    if (audio && audio->isMusicOn())
     {
         window.draw(musicOnButton);
     }
@@ -168,5 +202,6 @@ void OptionsScreen::draw(sf::RenderWindow &window)
     {
         window.draw(musicOffButton);
     }
+    
     slider.draw(window);
 }

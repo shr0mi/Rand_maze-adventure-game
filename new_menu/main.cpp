@@ -227,7 +227,7 @@ void runGame(sf::RenderWindow &window)
         if (isPaused)
         {
             window.setView(window.getDefaultView());
-            pauseMenu.draw(window);
+            pauseMenu.draw(window, audioManager);
         }
 
         window.display();
@@ -241,7 +241,7 @@ int main()
 
     ViewManager viewManager;
     MenuScreen menu;
-    OptionsScreen options;
+    OptionsScreen options(audioManager);
     CreditsScreen credits;
 
     Scene scene = Scene::Menu;

@@ -7,9 +7,10 @@ class AudioManager
 public:
     AudioManager();
     void toggleMusic();
-    void updateIconPosition(const sf::Vector2f &pos);
     void draw(sf::RenderWindow &window) const;
     void setVolume(float volume);
+    bool isMusicOn() const;
+    float getVolume() const;
 
 private:
     sf::Music backgroundMusic;
