@@ -13,13 +13,13 @@ int randNum(int min, int max){
     return randomNum;
 }
 
-void bsp(vector<vector<int>>& map, int x, int y, int W, int H);
+void bsp(vector<vector<int>>& map, int x, int y, int W, int H, int max_room_size);
 
-void horizontal_split(vector<vector<int>>& map, int x, int y, int W, int H){
+void horizontal_split(vector<vector<int>>& map, int x, int y, int W, int H, int max_room_size){
     //Split the map horizontally
-    int x1 = randNum(x+30, x+W-30);
-    bsp(map, x, y, x1-x, H);
-    bsp(map, x1, y, W+x-x1, H);
+    int x1 = randNum(x+max_room_size, x+W-max_room_size);
+    bsp(map, x, y, x1-x, H, max_room_size);
+    bsp(map, x1, y, W+x-x1, H, max_room_size);
     
     //Join the centers of two rooms
     int cx1 = x + (x1 - x)/2;
@@ -37,11 +37,11 @@ void horizontal_split(vector<vector<int>>& map, int x, int y, int W, int H){
 
 }
 
-void vertical_split(vector<vector<int>>& map, int x, int y, int W, int H){
+void vertical_split(vector<vector<int>>& map, int x, int y, int W, int H, int max_room_size){
     //Split the map vertically
-    int y1 = randNum(y+30, y+H-30);
-    bsp(map, x, y, W, y1-y);
-    bsp(map, x, y1, W, H+y-y1);
+    int y1 = randNum(y+max_room_size, y+H-max_room_size);
+    bsp(map, x, y, W, y1-y, max_room_size);
+    bsp(map, x, y1, W, H+y-y1, max_room_size);
 
     //Join the centers of two rooms
     int cy1 = y + (y1 - y)/2;
@@ -54,21 +54,25 @@ void vertical_split(vector<vector<int>>& map, int x, int y, int W, int H){
     }
 }
 
-void bsp(vector<vector<int>>& map, int x, int y, int W, int H){
-    if(W>=60 && H>=60){
+bool firstRoom = true;
+pair<int, int> player_pos;
+vector<pair<int, int>> room_centers;
+
+void bsp(vector<vector<int>>& map, int x, int y, int W, int H, int max_room_size){
+    if(W>=max_room_size*2 && H>=max_room_size*2){
         int choice = randNum(0, 1); // Randomly choose to split horizontally or vertically
         if(choice == 0){
-            horizontal_split(map, x, y, W, H);
+            horizontal_split(map, x, y, W, H, max_room_size);
         }else{
-            vertical_split(map, x, y, W, H);
+            vertical_split(map, x, y, W, H, max_room_size);
         }
-    }else if(W>=60){
+    }else if(W>=max_room_size*2){
         // Horizontal split only
-        horizontal_split(map, x, y, W, H);
+        horizontal_split(map, x, y, W, H, max_room_size);
 
-    }else if(H>=60){
+    }else if(H>=max_room_size*2){
         // Vertical split only
-        vertical_split(map, x, y, W, H);
+        vertical_split(map, x, y, W, H, max_room_size);
 
     }else{
         // Leaf Codes
@@ -76,17 +80,35 @@ void bsp(vector<vector<int>>& map, int x, int y, int W, int H){
         //cout << "------------------\n";
 
         // Draw rooms
-        int rand_room_shrink_y = randNum(3, 7);
-        int rand_room_shrink_x = randNum(3, 7);
+        int rand_room_shrink_y = randNum(3, 5);
+        int rand_room_shrink_x = randNum(3, 5);
         for(int i=y + rand_room_shrink_y; i< y + H - rand_room_shrink_y;i++){
             for(int j=x + rand_room_shrink_x;j< x + W - rand_room_shrink_x;j++){
                 map[i][j] = 1;
             }
         }
 
-        map[randNum(y + rand_room_shrink_y + 1, y + H - rand_room_shrink_y - 2)][randNum(x + rand_room_shrink_x + 1, x + W - rand_room_shrink_x - 2)] = -1;
-        map[randNum(y + rand_room_shrink_y + 1, y + H - rand_room_shrink_y - 2)][randNum(x + rand_room_shrink_x + 1, x + W - rand_room_shrink_x - 2)] = -2;
-        map[randNum(y + rand_room_shrink_y + 1, y + H - rand_room_shrink_y - 2)][randNum(x + rand_room_shrink_x + 1, x + W - rand_room_shrink_x - 2)] = -3; 
+        //Room centers
+        int room_center_y = (y + rand_room_shrink_y + y + H - rand_room_shrink_y)/2;
+        int room_center_x = (x + rand_room_shrink_x + x + W - rand_room_shrink_x)/2;
+
+        if(firstRoom){
+            // Set Player Position -> -4 is player position
+            cout << room_center_x << " " << room_center_y << endl;
+            player_pos.first = room_center_x; player_pos.second = room_center_y;
+            firstRoom = false;
+        }else{
+
+            //Enemy Generation -> -1 = shooter enemy, -2 = Turrent Enemy, -3 = Exploding Enemy
+            if(randNum(1, 2) == 1)
+                map[randNum(y + rand_room_shrink_y + 1, y + H - rand_room_shrink_y - 2)][randNum(x + rand_room_shrink_x + 1, x + W - rand_room_shrink_x - 2)] = -1;
+            if(randNum(1, 2) == 1)
+                map[randNum(y + rand_room_shrink_y + 1, y + H - rand_room_shrink_y - 2)][randNum(x + rand_room_shrink_x + 1, x + W - rand_room_shrink_x - 2)] = -2;
+            if(randNum(1, 2) == 1)
+                map[randNum(y + rand_room_shrink_y + 1, y + H - rand_room_shrink_y - 2)][randNum(x + rand_room_shrink_x + 1, x + W - rand_room_shrink_x - 2)] = -3;
+
+            room_centers.push_back({room_center_x, room_center_y});
+        }
 
     }
 }
@@ -137,13 +159,41 @@ void draw_trees(vector<vector<int>>& map){
     }
 }
 
+//Position Keys and Chest in the map
+void draw_keys_and_chest(vector<vector<int>>& map){
+    set<int> s;
+    while(s.size() < 4){
+        s.insert(randNum(0, room_centers.size()-1));
+    }
+    // place keys and Chest in Map -> -5=keys and -6=chest
+    int k=1;
+    for(auto i: s){
+        if(k<=3){
+            map[room_centers[i].second][room_centers[i].first] = -5;
+            k++;
+        }else{
+            map[room_centers[i].second][room_centers[i].first] = -6;
+        }
+    }
+}
+
 vector<vector<int>> BSP_algorithm::generate_bsp_map(int width, int height){
     vector<vector<int>> map(height, vector<int>(width, 0));
 
-    bsp(map, 0, 0, width, height);
+    bsp(map, 0, 0, width, height, 17);
     draw_walls(map);
     draw_floors_and_paths(map);
     draw_trees(map);
+    draw_keys_and_chest(map);
+    map[player_pos.second][player_pos.first] = -4;
+    for(int i=0;i<map.size();i++){
+        for(int j=0;j<map[i].size();j++){
+            if(map[i][j] == -4){
+                cout << "found it" << endl;
+                break;
+            }
+        }
+    }
 
     return map;
 }
