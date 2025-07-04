@@ -43,7 +43,7 @@ public:
     void handleEvent(const sf::Event& event, const sf::RenderWindow& window, AudioManager& audioManager);
     bool backClicked(sf::Vector2f pos);
     bool creditsClicked(sf::Vector2f pos);
-    void syncWithAudio(); // method to sync volume + music toggle
+    void syncWithAudio(AudioManager& audioManager);
 
 private:
     sf::Texture bgTexture, optionTexture, musicTexture, backTexture, creditsTexture, musicOnTexture, musicOffTexture;

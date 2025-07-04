@@ -151,12 +151,13 @@ OptionsScreen::OptionsScreen(AudioManager &audioManager) : bgTexture("assets/men
     this->audio = &audioManager;
 }
 
-void OptionsScreen::syncWithAudio()
+void OptionsScreen::syncWithAudio(AudioManager& audioManager)
 {
-    if (audio)
-    {
-        slider.setVolume(audio->getVolume());
-    }
+    // if (audio)
+    // {
+    //     slider.setVolume(audio->getVolume());
+    // }
+    slider.setVolume(audioManager.getVolume());
 }
 
 
@@ -171,7 +172,7 @@ void OptionsScreen::handleEvent(const sf::Event &event, const sf::RenderWindow &
         if (musicOnButton.getGlobalBounds().contains(pos) || musicOffButton.getGlobalBounds().contains(pos))
         {
             audioManager.toggleMusic();
-            syncWithAudio();  // Update slider and toggle display
+            syncWithAudio(audioManager);  // Update slider and toggle display
         }
     }
 }

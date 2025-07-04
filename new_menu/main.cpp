@@ -79,6 +79,7 @@ void runGame(sf::RenderWindow &window)
 {
     GameTimer gameTimer;
     PauseMenu pauseMenu;
+    pauseMenu.syncWithAudio(audioManager);
 
     sf::Clock clock;
     bool isPaused = false;
@@ -276,6 +277,7 @@ int main()
                     {
                         scene = Scene::Options;
                         viewManager.setView(Scene::Options);
+                        options.syncWithAudio(audioManager);
                     }
                     else if (menu.exitClick(pos))
                     {
@@ -284,6 +286,8 @@ int main()
                 }
                 else if (scene == Scene::Options)
                 {
+                    options.syncWithAudio(audioManager);
+
                     if (options.backClicked(pos))
                     {
                         scene = Scene::Menu;
