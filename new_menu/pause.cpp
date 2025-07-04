@@ -14,26 +14,26 @@ PauseMenu::PauseMenu() : // bgTexture("assets/menubg.png"),
                          menuButton(menuTexture),
                          resumeButton(resumeTexture),
 
-                         slider(200, 250, 400),
+                         slider(320, 350, 400),
                          musicOn(true)
 {
 
     // background.setPosition({-100, 50});
     // background.setScale({1.3f, 1.3f});
 
-    pauseTitle.setPosition({210, 50});
-    pauseTitle.setScale({0.3f, 0.3f});
+    pauseTitle.setPosition({270, 200});
+    pauseTitle.setScale({0.4f, 0.4f});
 
-    musicOnButton.setPosition({250, 300});
+    musicOnButton.setPosition({350, 450});
     musicOnButton.setScale({0.2f, 0.2f});
 
-    musicOffButton.setPosition({250, 300});
+    musicOffButton.setPosition({350, 450});
     musicOffButton.setScale({0.2f, 0.2f});
 
-    menuButton.setPosition({300, 450});
+    menuButton.setPosition({410, 600});
     menuButton.setScale({0.3f, 0.3f});
 
-    resumeButton.setPosition({300, 600});
+    resumeButton.setPosition({410, 750});
     resumeButton.setScale({0.3f, 0.3f});
 }
 
