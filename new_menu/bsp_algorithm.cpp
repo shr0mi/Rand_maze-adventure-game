@@ -13,9 +13,9 @@ int randNum(int min, int max){
     return randomNum;
 }
 
-void bsp(vector<vector<int>>& map, int x, int y, int W, int H, int max_room_size);
+// void bsp(vector<vector<int>>& map, int x, int y, int W, int H, int max_room_size);
 
-void horizontal_split(vector<vector<int>>& map, int x, int y, int W, int H, int max_room_size){
+void BSP_algorithm::horizontal_split(vector<vector<int>>& map, int x, int y, int W, int H, int max_room_size){
     //Split the map horizontally
     int x1 = randNum(x+max_room_size, x+W-max_room_size);
     bsp(map, x, y, x1-x, H, max_room_size);
@@ -37,7 +37,7 @@ void horizontal_split(vector<vector<int>>& map, int x, int y, int W, int H, int 
 
 }
 
-void vertical_split(vector<vector<int>>& map, int x, int y, int W, int H, int max_room_size){
+void BSP_algorithm::vertical_split(vector<vector<int>>& map, int x, int y, int W, int H, int max_room_size) {
     //Split the map vertically
     int y1 = randNum(y+max_room_size, y+H-max_room_size);
     bsp(map, x, y, W, y1-y, max_room_size);
@@ -54,11 +54,11 @@ void vertical_split(vector<vector<int>>& map, int x, int y, int W, int H, int ma
     }
 }
 
-bool firstRoom = true;
+
 pair<int, int> player_pos;
 vector<pair<int, int>> room_centers;
 
-void bsp(vector<vector<int>>& map, int x, int y, int W, int H, int max_room_size){
+void BSP_algorithm::bsp(vector<vector<int>>& map, int x, int y, int W, int H, int max_room_size){
     if(W>=max_room_size*2 && H>=max_room_size*2){
         int choice = randNum(0, 1); // Randomly choose to split horizontally or vertically
         if(choice == 0){
@@ -114,7 +114,7 @@ void bsp(vector<vector<int>>& map, int x, int y, int W, int H, int max_room_size
 }
 
 //Draw Floors and Paths
-void draw_floors_and_paths(vector<vector<int>>& map){
+void draw_floors_and_paths(vector<vector<int>>& map) {
     int floors[10] = {1, 1, 1, 1, 1, 1, 2, 3, 4, 5};
     for(int i=0;i<map.size();i++){
         for(int j=0;j<map[i].size();j++){

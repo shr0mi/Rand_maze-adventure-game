@@ -12,6 +12,8 @@ public:
 
     void update(float dt, bool isPaused);
     void draw(sf::RenderWindow &window);
+    int get_minutes();
+    int get_seconds();
 
 private:
     float totalTime;

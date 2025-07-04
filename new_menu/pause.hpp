@@ -18,8 +18,8 @@ public:
     void syncWithAudio(AudioManager &audioManager);  // New
 
 private:
-    sf::Texture pauseTexture, /*bgTexture,*/ musicOnTexture, musicOffTexture, menuTexture, resumeTexture;
-    sf::Sprite /*background,*/ pauseTitle, musicOnButton, musicOffButton, menuButton, resumeButton;
+    sf::Texture pauseTexture, musicOnTexture, musicOffTexture, menuTexture, resumeTexture;
+    sf::Sprite pauseTitle, musicOnButton, musicOffButton, menuButton, resumeButton;
     SliderVolume slider;
 };
 

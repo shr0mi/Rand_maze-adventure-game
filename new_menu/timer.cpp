@@ -47,3 +47,17 @@ void GameTimer::draw(sf::RenderWindow &window)
     window.draw(timerText);
     window.setView(currentView); // Restore previous view
 }
+
+//Return Minutes
+int GameTimer::get_minutes(){
+    int totalSeconds = static_cast<int>(totalTime);
+    int minutes = totalSeconds / 60;
+    return minutes;
+}
+
+//Return seconds
+int GameTimer::get_seconds(){
+    int totalSeconds = static_cast<int>(totalTime);
+    int seconds = totalSeconds % 60;
+    return seconds;
+}
