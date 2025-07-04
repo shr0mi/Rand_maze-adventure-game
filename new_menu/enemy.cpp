@@ -1,6 +1,7 @@
 #include "enemy.hpp"
 //: sprite(tex, sf::IntRect({col * 17, row * 17}, {16, 16}))
 
+// Constructor: sets up texture frame and position for the shooter enemy
 ShooterEnemy::ShooterEnemy(sf::Texture &tex, float x, float y)
     : sprite(tex, sf::IntRect({(19 - 1) * 17, (9 - 1) * 17}, {16, 16}))
 {
@@ -9,11 +10,14 @@ ShooterEnemy::ShooterEnemy(sf::Texture &tex, float x, float y)
     sprite.setPosition({x, y});
 }
 
+
 void ShooterEnemy::update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &bullets)
 {
+    // Get sprite center and vector to player
     sf::Vector2f spritemiddle = sprite.getPosition() + sf::Vector2f(8.f,8.f);
     sf::Vector2f toPlayer = playerPos - spritemiddle;
     
+    // If player is within shoot range, fire a bullet every 0.5 seconds
     if (std::sqrt(toPlayer.x * toPlayer.x + toPlayer.y * toPlayer.y) < SHOOT_RANGE)
     {
         if (shootClock.getElapsedTime().asSeconds() > 0.5f)
@@ -22,10 +26,8 @@ void ShooterEnemy::update(float dt, const sf::Vector2f &playerPos, std::vector<E
             shootClock.restart();
         }
     }
-    // if (recentlyDamaged && damageClock.getElapsedTime().asSeconds() > 0.2f) {
-    // sprite.setColor(sf::Color::White); // <-- Changed color reset
-    // recentlyDamaged = false;
-    // Changed: revert color to white after 0.2s if damaged
+
+// Reset color after damage flash timeout
 if (recentlyDamaged && damageClock.getElapsedTime().asSeconds() > 0.2f) {
     sprite.setColor(sf::Color::White); // <-- Changed color reset
     recentlyDamaged = false;
@@ -35,14 +37,20 @@ if (recentlyDamaged && damageClock.getElapsedTime().asSeconds() > 0.2f) {
 
 }
 
+// Render ShooterEnemy
 void ShooterEnemy::draw(sf::RenderWindow &window)
 {
     window.draw(sprite);
 }
+
+
+// Returns true if shooter is alive
 bool ShooterEnemy::isAlive() const {
     return health > 0;
 }
 
+
+// Reduces health and triggers red flash when damaged
 void ShooterEnemy::takeDamage(int amount) {
     health -= amount;
     sprite.setColor(sf::Color::Red); // <-- Changed color on hit
@@ -50,11 +58,13 @@ void ShooterEnemy::takeDamage(int amount) {
     recentlyDamaged = true;          // <-- Changed for color tracking
 }
 
+
+// Returns collision bounds of the sprite
 sf::FloatRect ShooterEnemy::getBounds() const {
     return sprite.getGlobalBounds();
 }
 
-
+// Constructor: sets sprite frame and stores spawn position
 ExploderEnemy::ExploderEnemy(sf::Texture &tex, float x, float y)
     : sprite(tex, sf::IntRect({(19 - 1) * 17, (8 - 1) * 17}, {16, 16})),
       spawnPos(x, y)
@@ -68,7 +78,7 @@ ExploderEnemy::ExploderEnemy(sf::Texture &tex, float x, float y)
 void ExploderEnemy::update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &, const std::vector<std::vector<int>>& collisionMap)
 {
     if (!active) return;
-
+     // Calculate distances to player and from spawn
     sf::Vector2f currentPos = sprite.getPosition();
     sf::Vector2f toPlayer = playerPos - currentPos;
     sf::Vector2f toPlayerFromSpawn = playerPos - spawnPos;
@@ -76,6 +86,7 @@ void ExploderEnemy::update(float dt, const sf::Vector2f &playerPos, std::vector<
     float distToSpawn = std::sqrt(toPlayerFromSpawn.x * toPlayerFromSpawn.x + toPlayerFromSpawn.y * toPlayerFromSpawn.y);
     float distToPlayer = std::sqrt(toPlayer.x * toPlayer.x + toPlayer.y * toPlayer.y);
 
+       // If close enough to player, explode (deactivate)
     if (distToPlayer < EXPLODE_RANGE)
     {
         active = false;
@@ -83,11 +94,13 @@ void ExploderEnemy::update(float dt, const sf::Vector2f &playerPos, std::vector<
         return;
     }
 
+    
+    // If within chase range from spawn, start chasing
     if (distToSpawn < CHASE_RANGE)
     {
         chasing = true;
 
-        // Animate frames
+        // Animate explosion sprite frames while chasing
         int baseCol = 19;
         int frameCount = 6;
         float frameTime = 0.1f;
@@ -95,6 +108,7 @@ void ExploderEnemy::update(float dt, const sf::Vector2f &playerPos, std::vector<
         int currentCol = baseCol + frame;
         sprite.setTextureRect(sf::IntRect({(currentCol - 1) * 17, (8 - 1) * 17}, {16, 16}));
 
+        // Calculate next position
         sf::Vector2f dir = normalize(toPlayer);
         sf::Vector2f nextPos = currentPos + dir * ENEMY_SPEED * dt;
 
@@ -103,6 +117,7 @@ void ExploderEnemy::update(float dt, const sf::Vector2f &playerPos, std::vector<
         int col = static_cast<int>(checkPos.x) / 16;
         int row = static_cast<int>(checkPos.y) / 16;
 
+        // If not colliding with a wall, move
         if (row >= 0 && row < (int)collisionMap.size() &&
             col >= 0 && col < (int)collisionMap[0].size() &&
             collisionMap[row][col] == 0)
@@ -113,6 +128,7 @@ void ExploderEnemy::update(float dt, const sf::Vector2f &playerPos, std::vector<
     }
     else
     {
+        // Out of range, stop chasing and reset sprite
         chasing = false;
         sprite.setTextureRect(sf::IntRect({(19 - 1) * 17, (8 - 1) * 17}, {16, 16}));
     }
@@ -123,6 +139,8 @@ void ExploderEnemy::update(float dt, const sf::Vector2f &playerPos, std::vector<
     }
 }
 
+
+// Renders ExploderEnemy if it's active
 void ExploderEnemy::draw(sf::RenderWindow &window)
 {
     if (active)
@@ -134,10 +152,14 @@ void ExploderEnemy::update(float dt, const sf::Vector2f &playerPos, std::vector<
     static std::vector<std::vector<int>> emptyMap;
     update(dt, playerPos, bullets, emptyMap);
 }
+
+
+// Returns true if alive and not exploded
 bool ExploderEnemy::isAlive() const {
     return active && health > 0;
 }
 
+// Handle taking damage
 void ExploderEnemy::takeDamage(int amount) {
     health -= amount;
      sprite.setColor(sf::Color::Red); // <-- Changed color on hit
@@ -150,11 +172,12 @@ void ExploderEnemy::takeDamage(int amount) {
     }
 }
 
+// Get collision box of sprite
 sf::FloatRect ExploderEnemy::getBounds() const {
     return sprite.getGlobalBounds();
 }
 
-
+// Constructor: initializes turret sprite frame and position
 TurretEnemy::TurretEnemy(sf::Texture &tex, float x, float y)
     : sprite(tex, sf::IntRect({(19 - 1) * 17, (10 - 1) * 17}, {16, 16}))
 {
@@ -163,12 +186,14 @@ TurretEnemy::TurretEnemy(sf::Texture &tex, float x, float y)
     sprite.setPosition({x, y});
 }
 
+// Update: shoots radial bullets every 2 seconds
 void TurretEnemy::update(float dt, const sf::Vector2f &, std::vector<EnemyBullet> &bullets)
 {
     if (shootClock.getElapsedTime().asSeconds() >= shootInterval)
     {
         sf::Vector2f center = sprite.getPosition()+sf::Vector2f(8.f,8.f);
 
+         // Shoot bullets in a circle
         for (int i = 0; i < bulletCount; ++i)
         {
             float angle = i * (2 * 3.14159265f / bulletCount);
@@ -185,21 +210,24 @@ void TurretEnemy::update(float dt, const sf::Vector2f &, std::vector<EnemyBullet
     }
 }
 
+// Draw the turret enemy
 void TurretEnemy::draw(sf::RenderWindow &window)
 {
     window.draw(sprite);
 }
+// Returns if turret is alive
 bool TurretEnemy::isAlive() const {
     return health > 0;
 }
 
+// Damage handler for turret
 void TurretEnemy::takeDamage(int amount) {
     health -= amount;
     sprite.setColor(sf::Color::Red); // <-- Changed color on hit
     damageClock.restart();           // <-- Changed for color timing
     recentlyDamaged = true;          // <-- Changed for color tracking
 }
-
+// Get turret hitbox
 sf::FloatRect TurretEnemy::getBounds() const {
     return sprite.getGlobalBounds();
 }
