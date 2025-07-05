@@ -30,7 +30,6 @@ MenuScreen::MenuScreen() :
     exitButton.setPosition({390, 420});
     exitButton.setScale({0.3f, 0.3f});
 
-    // font.openFromFile("arial.ttf");
 }
 
 bool MenuScreen::playClick(sf::Vector2f pos)
