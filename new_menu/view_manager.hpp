@@ -7,6 +7,7 @@ enum class Scene
 {
     Menu,
     Options,
+    Leaderboard,
     Credits
 };
 

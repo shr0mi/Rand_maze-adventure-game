@@ -275,6 +275,7 @@ int main()
     ViewManager viewManager;
     MenuScreen menu;
     OptionsScreen options(audioManager);
+    LeaderboardScreen leaderboard;
     CreditsScreen credits;
 
     Scene scene = Scene::Menu;
@@ -311,6 +312,12 @@ int main()
                         viewManager.setView(Scene::Options);
                         options.syncWithAudio(audioManager);
                     }
+                    else if (menu.boardClick(pos))
+                    {
+                        scene = Scene::Leaderboard;
+                        viewManager.setView(Scene::Leaderboard);
+                        options.syncWithAudio(audioManager);
+                    }
                     else if (menu.exitClick(pos))
                     {
                         window.close();
@@ -331,6 +338,11 @@ int main()
                         viewManager.setView(Scene::Credits);
                     }
                 }
+                else if (scene == Scene::Leaderboard && leaderboard.backClicked(pos))
+                {
+                    scene = Scene::Menu;
+                    viewManager.setView(Scene::Menu);
+                }
                 else if (scene == Scene::Credits && credits.backClicked(pos))
                 {
                     scene = Scene::Options;
@@ -346,6 +358,8 @@ int main()
             menu.draw(window);
         else if (scene == Scene::Options)
             options.draw(window);
+        else if (scene == Scene::Leaderboard)
+            leaderboard.draw(window);
         else if (scene == Scene::Credits)
             credits.draw(window);
 

@@ -1,22 +1,24 @@
-#pragma once
+#ifndef LEADERBOARD_HPP
+#define LEADERBOARD_HPP
+
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
 
-class Leaderboard {
+class LeaderboardScreen {
 public:
-    Leaderboard();
-    void run();
+    LeaderboardScreen();
+    void draw(sf::RenderWindow& window);
+    bool backClicked(sf::Vector2f pos);
 
 private:
-    void handleEvents();
-    void render();
-    void loadDummyScores();
-
-    sf::RenderWindow window;
+    void loadScores();
+    
+    sf::Texture bgTexture, leaderboardTexture, backTexture;
+    sf::Sprite background, leaderboardImage, backButton;
     sf::Font font;
-    std::vector<std::pair<std::string, int>> scores;
+    std::vector<int> scores;
     std::vector<sf::Text> scoreTexts;
-    // sf::Texture leaderboardTexture, bgTexture;
-    // sf::Sprite leaderboardTitle, bgImage;
 };
+
+#endif

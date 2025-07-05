@@ -18,6 +18,9 @@ void ViewManager::setView(Scene scene)
     case Scene::Credits:
         view.setCenter({2400.f, 270.f});
         break;
+    case Scene::Leaderboard:
+        view.setCenter({3360.f, 270.f}); // New position for leaderboard screen
+        break;
     }
 }
 
