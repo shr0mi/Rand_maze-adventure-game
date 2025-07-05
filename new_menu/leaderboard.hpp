@@ -17,8 +17,6 @@ private:
     sf::Font font;
     std::vector<std::pair<std::string, int>> scores;
     std::vector<sf::Text> scoreTexts;
-    sf::Texture leaderboardTexture, bgTexture;
-    sf::Sprite leaderboardTitle, bgImage;
-    // sf::Text title;
-    // sf::Text backText;
+    // sf::Texture leaderboardTexture, bgTexture;
+    // sf::Sprite leaderboardTitle, bgImage;
 };

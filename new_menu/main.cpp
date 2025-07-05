@@ -13,6 +13,7 @@
 #include "bsp_algorithm.h"
 #include "timer.h"
 #include "pause.hpp"
+#include "leaderboard.hpp"
 
 std::vector<std::shared_ptr<BaseEnemy>> enemies;
 sf::Texture texture;
@@ -86,6 +87,7 @@ void runGame(sf::RenderWindow &window)
     sf::Clock clock;
     bool isPaused = false;
     bool firstTime = true;
+    bool isLeaderboardOpen = false;
 
     BSP_algorithm bsp;
     std::vector<std::vector<int>> level = bsp.generate_bsp_map(150, 150);
@@ -140,11 +142,23 @@ void runGame(sf::RenderWindow &window)
 
             // If Game is Over then go to Leaderboard
 
-            if(chest.isOpened() && firstTime) {
-                //sf::sleep(sf::seconds(3));
-                OpenLeaderboard(gameTimer);
-                firstTime = false;
-            }
+            // // if(chest.isOpened() && firstTime) {
+            // if (event->is<sf::Event::KeyPressed>())
+            // {
+            //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::L))
+            //     {
+            //         isLeaderboardOpen = !isLeaderboardOpen; // Toggle leaderboard visibility
+            //         // sf::sleep(sf::seconds(3));
+            //         // OpenLeaderboard(gameTimer);
+            //         // firstTime = false;
+            //     }
+            // }
+
+            // if (isLeaderboardOpen)
+            // {
+            //     OpenLeaderboard(gameTimer);
+            //     firstTime = false;
+            // }
         }
 
         // Player
@@ -242,6 +256,13 @@ void runGame(sf::RenderWindow &window)
             pauseMenu.draw(window, audioManager);
         }
 
+        // if (isLeaderboardOpen)
+        // {
+        //     // Display leaderboard window
+        //     Leaderboard leaderboard;
+        //     leaderboard.run();
+        // }
+
         window.display();
     }
 }
@@ -334,28 +355,57 @@ int main()
     return 0;
 }
 
+// void OpenLeaderboard(GameTimer &gameTimer) {
+//     cout << "You Win! Your Record: " << gameTimer.get_minutes() << " : " << gameTimer.get_seconds() << endl;
 
-void OpenLeaderboard(GameTimer &gameTimer) {
-    cout << "You Win! Your Record: " << gameTimer.get_minutes() << " : " << gameTimer.get_seconds() << endl;
+//     vector<int> top_seven_scores;
+//     FILE *fptr;
+//     fptr = fopen("scoreboard.dat", "rb");
+//     int x;
+//     while(fread(&x, sizeof(int), 1, fptr) == 1){
+//         top_seven_scores.push_back(x);
+//     }
+//     fclose(fptr);
 
-    vector<int> top_seven_scores;
-    FILE *fptr;
-    fptr = fopen("scoreboard.dat", "rb");
+//     int current_score = gameTimer.get_minutes() * 60 + gameTimer.get_seconds();
+//     top_seven_scores.push_back(current_score);
+//     sort(top_seven_scores.begin(), top_seven_scores.end());
+
+//     fptr = fopen("scoreboard.dat", "wb");
+//     for(int i=0;i< min(7, (int)top_seven_scores.size());i++){
+//         fwrite(&top_seven_scores[i], sizeof(int), 1, fptr);
+//         cout << top_seven_scores[i] << endl;
+//     }
+//     fclose(fptr);
+
+// }
+
+void OpenLeaderboard(GameTimer &gameTimer)
+{
+    std::cout << "You Win! Your Record: " << gameTimer.get_minutes() << " : " << gameTimer.get_seconds() << std::endl;
+
+    std::vector<int> top_seven_scores;
+
+    // Load from "scoreboard.txt"
+    std::ifstream infile("scoreboard.txt");
     int x;
-    while(fread(&x, sizeof(int), 1, fptr) == 1){
+    while (infile >> x)
+    {
         top_seven_scores.push_back(x);
     }
-    fclose(fptr);
+    infile.close();
 
+    // Add current score
     int current_score = gameTimer.get_minutes() * 60 + gameTimer.get_seconds();
     top_seven_scores.push_back(current_score);
-    sort(top_seven_scores.begin(), top_seven_scores.end());
+    std::sort(top_seven_scores.begin(), top_seven_scores.end());
 
-    fptr = fopen("scoreboard.dat", "wb");
-    for(int i=0;i< min(7, (int)top_seven_scores.size());i++){
-        fwrite(&top_seven_scores[i], sizeof(int), 1, fptr);
-        cout << top_seven_scores[i] << endl;
+    // Save top 7 scores
+    std::ofstream outfile("scoreboard.txt");
+    for (int i = 0; i < std::min(7, (int)top_seven_scores.size()); i++)
+    {
+        outfile << top_seven_scores[i] << std::endl;
+        std::cout << top_seven_scores[i] << std::endl;
     }
-    fclose(fptr);
-
+    outfile.close();
 }

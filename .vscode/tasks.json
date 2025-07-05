@@ -20,6 +20,7 @@
 				"view_manager.cpp",
 				"credits.cpp",
 				"menu.cpp",
+				"leaderboard.cpp",
 
 				//"-I\"S:/sfml projects/library/SFML-3.0.0/include\"",
 				"-I\"C:/Users/USER/Documents/SFML-3.0.0/include\"",
