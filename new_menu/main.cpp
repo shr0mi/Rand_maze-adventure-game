@@ -6,7 +6,6 @@
 #include "credits.hpp"
 #include "view_manager.hpp"
 #include "audio.hpp"
-
 #include "mapgen.h"
 #include "player.h"
 #include "enemy.hpp"
@@ -88,6 +87,7 @@ void runGame(sf::RenderWindow &window)
     bool isPaused = false;
     bool firstTime = true;
     bool isLeaderboardOpen = false;
+    bool isOver = false;
 
     BSP_algorithm bsp;
     std::vector<std::vector<int>> level = bsp.generate_bsp_map(150, 150);
@@ -108,6 +108,27 @@ void runGame(sf::RenderWindow &window)
         std::cerr << "Failed to load tilemap!" << std::endl;
         return;
     }
+
+    sf::Texture winTexture;
+    if (!winTexture.loadFromFile("assets/youWin.png"))
+    {
+        std::cerr << "Failed to load win texture!" << std::endl;
+        return;
+    }
+    sf::Sprite winSprite(winTexture);
+    winSprite.setPosition({500, 300});
+    winSprite.setScale({0.5f, 0.5f}); // Adjust scale as needed
+
+    sf::Font font;
+    if (!font.openFromFile("assets/arial.ttf"))
+    {
+        std::cerr << "Failed to load font!" << std::endl;
+        return;
+    }
+    sf::Text timeText(font);
+    timeText.setCharacterSize(30);
+    timeText.setFillColor(sf::Color::Yellow);
+    timeText.setPosition({380, 500}); // Adjust to position text below the sprite
 
     while (window.isOpen())
     {
@@ -135,30 +156,46 @@ void runGame(sf::RenderWindow &window)
                     if (pauseMenu.isResumeClicked(mousePos))
                         isPaused = false;
                     else if (pauseMenu.isMenuClicked(mousePos))
-                        // window.close();
                         return; // Back to main menu
                 }
             }
 
             // If Game is Over then go to Leaderboard
 
-            // // if(chest.isOpened() && firstTime) {
-            // if (event->is<sf::Event::KeyPressed>())
-            // {
-            //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::L))
-            //     {
-            //         isLeaderboardOpen = !isLeaderboardOpen; // Toggle leaderboard visibility
-            //         // sf::sleep(sf::seconds(3));
-            //         // OpenLeaderboard(gameTimer);
-            //         // firstTime = false;
-            //     }
-            // }
+            if (chest.isOpened() && firstTime)
+            {
+                // sf::sleep(sf::seconds(3));
+                OpenLeaderboard(gameTimer);
+                firstTime = false;
+            }
 
-            // if (isLeaderboardOpen)
-            // {
-            //     OpenLeaderboard(gameTimer);
-            //     firstTime = false;
-            // }
+            // Press X to WinMenu
+            if (event->is<sf::Event::KeyPressed>())
+            {
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X))
+                {
+                    isOver = true;
+                }
+            }
+
+            if (isOver)
+            {
+                // Game is over, Show: youWin sprite and write the final game time (like- Your Time: 10 m 5 s)
+                // And pause menu shouldn't be accessible
+
+                isPaused = false; // Disable pause when game is over
+
+                int totalSeconds = gameTimer.get_minutes() * 60 + gameTimer.get_seconds();
+                std::stringstream ss;
+                ss << "Your Time: " << gameTimer.get_minutes() << " m " << gameTimer.get_seconds() << " s";
+                timeText.setString(ss.str());
+
+                if (event->is<sf::Event::MouseButtonPressed>())
+                {
+                    // Click anywhere to return to menu
+                    return;
+                }
+            }
         }
 
         // Player
@@ -256,19 +293,24 @@ void runGame(sf::RenderWindow &window)
             pauseMenu.draw(window, audioManager);
         }
 
-        // if (isLeaderboardOpen)
-        // {
-        //     // Display leaderboard window
-        //     Leaderboard leaderboard;
-        //     leaderboard.run();
-        // }
+        if (isOver)
+        {
+            window.setView(window.getDefaultView()); // Reset view for overlay
+            window.draw(winSprite);
+            window.draw(timeText);
+            window.display();
+            continue; // Skip remaining rendering
+        }
 
         window.display();
     }
 }
 
+void LeaderBoardTest();
+
 int main()
 {
+    LeaderBoardTest();
     sf::RenderWindow window(sf::VideoMode({960, 540}), "Main Menu", sf::Style::None);
     window.setFramerateLimit(60);
 
@@ -369,57 +411,41 @@ int main()
     return 0;
 }
 
-// void OpenLeaderboard(GameTimer &gameTimer) {
-//     cout << "You Win! Your Record: " << gameTimer.get_minutes() << " : " << gameTimer.get_seconds() << endl;
-
-//     vector<int> top_seven_scores;
-//     FILE *fptr;
-//     fptr = fopen("scoreboard.dat", "rb");
-//     int x;
-//     while(fread(&x, sizeof(int), 1, fptr) == 1){
-//         top_seven_scores.push_back(x);
-//     }
-//     fclose(fptr);
-
-//     int current_score = gameTimer.get_minutes() * 60 + gameTimer.get_seconds();
-//     top_seven_scores.push_back(current_score);
-//     sort(top_seven_scores.begin(), top_seven_scores.end());
-
-//     fptr = fopen("scoreboard.dat", "wb");
-//     for(int i=0;i< min(7, (int)top_seven_scores.size());i++){
-//         fwrite(&top_seven_scores[i], sizeof(int), 1, fptr);
-//         cout << top_seven_scores[i] << endl;
-//     }
-//     fclose(fptr);
-
-// }
-
 void OpenLeaderboard(GameTimer &gameTimer)
 {
-    std::cout << "You Win! Your Record: " << gameTimer.get_minutes() << " : " << gameTimer.get_seconds() << std::endl;
+    cout << "You Win! Your Record: " << gameTimer.get_minutes() << " : " << gameTimer.get_seconds() << endl;
 
-    std::vector<int> top_seven_scores;
-
-    // Load from "scoreboard.txt"
-    std::ifstream infile("scoreboard.txt");
+    vector<int> top_seven_scores;
+    FILE *fptr;
+    fptr = fopen("scoreboard.dat", "rb");
     int x;
-    while (infile >> x)
+    while (fread(&x, sizeof(int), 1, fptr) == 1)
     {
         top_seven_scores.push_back(x);
     }
-    infile.close();
+    fclose(fptr);
 
-    // Add current score
     int current_score = gameTimer.get_minutes() * 60 + gameTimer.get_seconds();
     top_seven_scores.push_back(current_score);
-    std::sort(top_seven_scores.begin(), top_seven_scores.end());
+    sort(top_seven_scores.begin(), top_seven_scores.end());
 
-    // Save top 7 scores
-    std::ofstream outfile("scoreboard.txt");
-    for (int i = 0; i < std::min(7, (int)top_seven_scores.size()); i++)
+    fptr = fopen("scoreboard.dat", "wb");
+    for (int i = 0; i < min(7, (int)top_seven_scores.size()); i++)
     {
-        outfile << top_seven_scores[i] << std::endl;
-        std::cout << top_seven_scores[i] << std::endl;
+        fwrite(&top_seven_scores[i], sizeof(int), 1, fptr);
+        cout << top_seven_scores[i] << endl;
     }
-    outfile.close();
+    fclose(fptr);
+}
+
+void LeaderBoardTest()
+{
+    FILE *fptr;
+    fptr = fopen("scoreboard.dat", "wb");
+    int num1 = 120, num2 = 220, num3 = 330, num4 = 440;
+    fwrite(&num1, sizeof(int), 1, fptr);
+    fwrite(&num2, sizeof(int), 1, fptr);
+    fwrite(&num3, sizeof(int), 1, fptr);
+    fwrite(&num4, sizeof(int), 1, fptr);
+    fclose(fptr);
 }

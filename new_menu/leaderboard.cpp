@@ -2,6 +2,7 @@
 #include <fstream>
 #include <algorithm>
 #include <sstream>
+#include <iostream>
 
 LeaderboardScreen::LeaderboardScreen() :
     bgTexture("assets/menubg.png"),
@@ -25,35 +26,29 @@ LeaderboardScreen::LeaderboardScreen() :
     }
     loadScores();
 
-    // Render score text objects
-    float y = 150;
-    for (int i = 0; i < scores.size(); ++i) {
-        sf::Text text(font);
-        std::stringstream ss;
-        ss << (i + 1) << ". " << scores[i];
-        text.setString(ss.str());
-        text.setFont(font);
-        text.setCharacterSize(36);
-        text.setFillColor(sf::Color::White);
-        text.setPosition({4120, y});
-        y += 50;
-        scoreTexts.push_back(text);
-    }
 }
 
 void LeaderboardScreen::loadScores()
 {
-    std::ifstream file("scoreboard.txt");
-    int x;
-    while (file >> x) {
-        scores.push_back(x);
+    
+    float y = 100.0f;
+    FILE *fptr;
+    fptr = fopen("scoreboard.dat", "rb");
+    int x; int i=0;
+    while(fread(&x, sizeof(int), 1, fptr) == 1){
+        std::cout << x << std::endl;
+        std::stringstream ss;
+        ss << "#" << (i + 1) << " Score: " << x/60 << "m " << x%60 << "s";
+        std::string scoreLine = ss.str();
+
+        sf::Text line(font, scoreLine, 24);
+        line.setFillColor(sf::Color::Red);
+        line.setPosition({3000.0f, y + i * 40});
+
+        scoreTexts.push_back(line);
+        i++;
     }
-
-    std::sort(scores.begin(), scores.end());
-    std::reverse(scores.begin(), scores.end());
-
-    if (scores.size() > 7)
-        scores.resize(7); // Keep only top 7
+    fclose(fptr);
 }
 
 bool LeaderboardScreen::backClicked(sf::Vector2f pos)
@@ -66,6 +61,6 @@ void LeaderboardScreen::draw(sf::RenderWindow& window)
     window.draw(background);
     window.draw(leaderboardImage);
     window.draw(backButton);
-    for (const auto& text : scoreTexts)
+    for (auto& text : scoreTexts)
         window.draw(text);
 }
