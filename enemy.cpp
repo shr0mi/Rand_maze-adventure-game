@@ -1,4 +1,5 @@
 #include "enemy.hpp"
+#include <SFML/Graphics/RectangleShape.hpp>
 
 // Constructor: Initializes bullet shape, color, position, and velocity
 EnemyBullet::EnemyBullet(sf::Vector2f pos, sf::Vector2f dir)
@@ -45,6 +46,16 @@ ShooterEnemy::ShooterEnemy(sf::Texture &tex, float x, float y)
 {
     sprite.setScale({1.f, 1.f});
     sprite.setPosition({x, y});
+
+    // Health bar background
+    healthBarBack.setSize({16.f, 3.f});
+    healthBarBack.setFillColor(sf::Color(100, 100, 100));
+    healthBarBack.setPosition({x, y - 5});
+
+    // Health bar front (dynamic)
+    healthBarFront.setSize({16.f, 3.f});
+    healthBarFront.setFillColor(sf::Color::Green);
+    healthBarFront.setPosition({x, y - 5});
 }
 
 // Update: Shoots if player is in range, manages damage flash
@@ -69,12 +80,22 @@ void ShooterEnemy::update(float dt, const sf::Vector2f &playerPos, std::vector<E
         sprite.setColor(sf::Color::White);
         recentlyDamaged = false;
     }
+
+    sf::Vector2f pos = sprite.getPosition();
+    healthBarBack.setPosition({pos.x, pos.y - 5});
+    healthBarFront.setPosition({pos.x, pos.y - 5});
+    healthBarFront.setSize({16.f * static_cast<float>(health) / 3.f, 3.f}); // assumes max health is 3
 }
 
 // Draw enemy
 void ShooterEnemy::draw(sf::RenderWindow &window)
 {
     window.draw(sprite);
+    if (health < 3 && health > 0) // Show only when damaged
+    {
+        window.draw(healthBarBack);
+        window.draw(healthBarFront);
+    }
 }
 
 // Check if enemy is alive
@@ -98,6 +119,12 @@ sf::FloatRect ShooterEnemy::getBounds() const
     return sprite.getGlobalBounds();
 }
 
+
+
+
+
+
+
 // Constructor: Setup sprite and store spawn position
 ExploderEnemy::ExploderEnemy(sf::Texture &tex, float x, float y)
     : sprite(tex, sf::IntRect({(19 - 1) * 17, (8 - 1) * 17}, {16, 16})),
@@ -105,6 +132,16 @@ ExploderEnemy::ExploderEnemy(sf::Texture &tex, float x, float y)
 {
     sprite.setScale({1.f, 1.f});
     sprite.setPosition({x, y});
+
+    // Health bar background
+    healthBarBack.setSize({16.f, 3.f});
+    healthBarBack.setFillColor(sf::Color(100, 100, 100));
+    healthBarBack.setPosition({x, y - 5});
+
+    // Health bar front (dynamic)
+    healthBarFront.setSize({16.f, 3.f});
+    healthBarFront.setFillColor(sf::Color::Green);
+    healthBarFront.setPosition({x, y - 5});
 }
 
 // Update with collision map: Moves toward player, explodes if close, animates, handles collisions
@@ -167,6 +204,11 @@ void ExploderEnemy::update(float dt, const sf::Vector2f &playerPos, std::vector<
         sprite.setColor(sf::Color::White);
         recentlyDamaged = false;
     }
+
+    sf::Vector2f pos = sprite.getPosition();
+    healthBarBack.setPosition({pos.x, pos.y - 5});
+    healthBarFront.setPosition({pos.x, pos.y - 5});
+    healthBarFront.setSize({16.f * static_cast<float>(health) / 3.f, 3.f}); // assumes max health is 3
 }
 
 // Draw exploder only if active
@@ -174,6 +216,11 @@ void ExploderEnemy::draw(sf::RenderWindow &window)
 {
     if (active)
         window.draw(sprite);
+    if (health < 3 && health > 0) // Show only when damaged
+    {
+        window.draw(healthBarBack);
+        window.draw(healthBarFront);
+    }
 }
 
 // Dummy update to satisfy interface
@@ -210,12 +257,25 @@ sf::FloatRect ExploderEnemy::getBounds() const
     return sprite.getGlobalBounds();
 }
 
+
+
+
 // Constructor: Initialize turret position and sprite
 TurretEnemy::TurretEnemy(sf::Texture &tex, float x, float y)
     : sprite(tex, sf::IntRect({(19 - 1) * 17, (10 - 1) * 17}, {16, 16}))
 {
     sprite.setScale({1.f, 1.f});
     sprite.setPosition({x, y});
+
+    // Health bar background
+    healthBarBack.setSize({16.f, 3.f});
+    healthBarBack.setFillColor(sf::Color(100, 100, 100));
+    healthBarBack.setPosition({x, y - 5});
+
+    // Health bar front (dynamic)
+    healthBarFront.setSize({16.f, 3.f});
+    healthBarFront.setFillColor(sf::Color::Green);
+    healthBarFront.setPosition({x, y - 5});
 }
 
 // Update: Shoots bullets in circular pattern every few seconds
@@ -242,12 +302,22 @@ void TurretEnemy::update(float dt, const sf::Vector2f &, std::vector<EnemyBullet
         sprite.setColor(sf::Color::White);
         recentlyDamaged = false;
     }
+
+    sf::Vector2f pos = sprite.getPosition();
+    healthBarBack.setPosition({pos.x, pos.y - 5});
+    healthBarFront.setPosition({pos.x, pos.y - 5});
+    healthBarFront.setSize({16.f * static_cast<float>(health) / 3.f, 3.f}); // assumes max health is 3
 }
 
 // Draw turret
 void TurretEnemy::draw(sf::RenderWindow &window)
 {
     window.draw(sprite);
+    if (health < 3 && health > 0) // Show only when damaged
+    {
+        window.draw(healthBarBack);
+        window.draw(healthBarFront);
+    }
 }
 
 // Check if turret is still alive
@@ -270,3 +340,4 @@ sf::FloatRect TurretEnemy::getBounds() const
 {
     return sprite.getGlobalBounds();
 }
+

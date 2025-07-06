@@ -65,6 +65,8 @@ private:
     sf::Sprite sprite;
     sf::Clock shootClock;  // Timer for shooting
     sf::Clock damageClock; // Timer for damage color effect
+    sf::RectangleShape healthBarBack;
+    sf::RectangleShape healthBarFront;
 };
 
 class ExploderEnemy : public BaseEnemy
@@ -90,6 +92,8 @@ private:
     sf::Vector2f spawnPos; // Where the enemy was spawned (for range limit)
     sf::Clock shootClock;  // Used for animation timing
     sf::Clock damageClock; // Color effect timer
+    sf::RectangleShape healthBarBack;
+    sf::RectangleShape healthBarFront;
 };
 
 class TurretEnemy : public BaseEnemy
@@ -112,4 +116,6 @@ private:
     sf::Sprite sprite;     // Visual
     sf::Clock shootClock;  // Controls when to shoot
     sf::Clock damageClock; // Red flash effect after hit
+    sf::RectangleShape healthBarBack;
+    sf::RectangleShape healthBarFront;
 };
