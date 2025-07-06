@@ -67,7 +67,7 @@ int GameTimer::get_seconds()
     int seconds = totalSeconds % 60;
     return seconds;
 }
-void GameTimer::setKeyCount(int count) // <-- NEW
+void GameTimer::setKeyCount(int count) // Set the number of keys collected
 {
     keyCount = count;
     updateText(); // Update text immediately

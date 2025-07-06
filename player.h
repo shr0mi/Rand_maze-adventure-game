@@ -57,8 +57,8 @@ private:
 
     void checkBulletCollisions(std::vector<EnemyBullet> &enemyBullets);
 
-    sf::RectangleShape healthBarBack;
-    sf::RectangleShape healthBarFront;
+    sf::RectangleShape healthBarBack;  // health bar background
+    sf::RectangleShape healthBarFront; // health bar shape that changes size based on health
 };
 
 class Crosshair
@@ -134,7 +134,7 @@ public:
     Boss(GameInfo &gameinfo);
     void setpos(sf::Vector2f position);
     void draw(sf::RenderWindow &window) const;
-    void update(float dt, sf::RenderWindow &window, std::vector<Bullet> &playerBullets, std::vector<EnemyBullet> &enemyBullets,sf::Vector2f pos);
+    void update(float dt, sf::RenderWindow &window, std::vector<Bullet> &playerBullets, std::vector<EnemyBullet> &enemyBullets, sf::Vector2f pos);
     sf::FloatRect getBounds() const;
 
 private:
@@ -153,12 +153,11 @@ private:
     bool isVisible = true;               // whether to draw the sprite
 
     void handlePlayerBulletCollision(std::vector<Bullet> &playerBullets);
-    void handleWallBounce(float dt, std::vector<EnemyBullet> &enemyBullets,sf::Vector2f pos);
+    void handleWallBounce(float dt, std::vector<EnemyBullet> &enemyBullets, sf::Vector2f pos);
     bool checkWallCollision(const sf::FloatRect &bounds);
 
-
-    sf::RectangleShape healthBarBack;
-    sf::RectangleShape healthBarFront;
+    sf::RectangleShape healthBarBack; // health bar background
+    sf::RectangleShape healthBarFront; // health bar shape that changes size based on health
 };
 
 #endif

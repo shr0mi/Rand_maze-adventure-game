@@ -248,12 +248,7 @@ void Player::update(float dt, std::vector<EnemyBullet> &enemyBullets, sf::Render
     }
     cameraCenter += (sprite.getPosition() - cameraCenter) * cameraLag * dt; // interpolate camera
 
-    // sf::Vector2f pos = sprite.getPosition();        // or getPosition()
-    //  healthBarBack.setPosition({pos.x, pos.y - 10}); // above player sprite
-    //  healthBarFront.setPosition({pos.x, pos.y - 10});
-
-    // float healthRatio = std::max(0.f, static_cast<float>(health) / 200.f);
-    // healthBarFront.setSize({32.f * healthRatio, 4.f});
+    // Define player position for health bar
     sf::Vector2f playerPos = sprite.getPosition();
 
     // Position bars above the player sprite
@@ -418,16 +413,6 @@ void handleShooting(std::vector<Bullet> &bullets, sf::Texture &tex, const sf::Ve
     wasMousePressed = isMousePressed;
 }
 
-/*
-void updateBullets(std::vector<Bullet>& bullets, float dt, const sf::RenderWindow& window)
-{
-    for (auto& bullet : bullets)
-    {
-        bullet.update(dt);
-    }
-}
-*/
-
 void updateBullets(std::vector<Bullet> &bullets, float dt, const sf::RenderWindow &window, GameInfo &gi)
 {
     for (size_t i = 0; i < bullets.size();)
@@ -487,7 +472,10 @@ void Key::checkCollision(const sf::Vector2f &playerPos, float radius)
     float dist = std::hypot(playerPos.x - keyPos.x, playerPos.y - keyPos.y);
 
     if (dist < radius)
-       {sfx.playSound("kcoll"); collected = true;}
+    {
+        sfx.playSound("kcoll");
+        collected = true;
+    }
 }
 
 bool Key::isCollected() const
@@ -587,18 +575,20 @@ void Boss::draw(sf::RenderWindow &window) const
         window.draw(healthBarBack);
         window.draw(healthBarFront);
     }
-
-
 }
 
-void Boss::update(float dt, sf::RenderWindow &window, std::vector<Bullet> &playerBullets, std::vector<EnemyBullet> &enemyBullets,sf::Vector2f pos)
+void Boss::update(float dt, sf::RenderWindow &window, std::vector<Bullet> &playerBullets, std::vector<EnemyBullet> &enemyBullets, sf::Vector2f pos)
 {
     if (!gi->active)
         return;
 
     if (defeated)
     {
-        if(deathTimer <=.4f ) {sfx.playSound("bdefeat");sfx.setVolume(20.f);}
+        if (deathTimer <= .4f)
+        {
+            sfx.playSound("bdefeat");
+            sfx.setVolume(20.f);
+        }
         sfx.setVolume(50.f);
         deathTimer += dt;
         if (deathTimer > 0.8f)
@@ -624,7 +614,7 @@ void Boss::update(float dt, sf::RenderWindow &window, std::vector<Bullet> &playe
     {
         angry = true;
         sprite.setTextureRect(sf::IntRect({36 * 17, 14 * 17}, {16, 16})); // angry sprite
-        velocity *= 2.f; // speed boost
+        velocity *= 2.f;                                                  // speed boost
     }
 
     // Hit flash effect
@@ -642,37 +632,31 @@ void Boss::update(float dt, sf::RenderWindow &window, std::vector<Bullet> &playe
     sf::FloatRect nextBounds = sprite.getGlobalBounds();
     nextBounds.position += velocity * dt;
 
-    handleWallBounce(dt, enemyBullets,pos);
+    handleWallBounce(dt, enemyBullets, pos);
     sprite.move(velocity * dt);
 
     // === Health Bar Setup ===
-    // === Health Bar Setup ===
-sf::FloatRect bounds = sprite.getGlobalBounds();
-sf::Vector2f center = bounds.position + bounds.size / 2.f;
+    sf::FloatRect bounds = sprite.getGlobalBounds();
+    sf::Vector2f center = bounds.position + bounds.size / 2.f;
 
-const float barWidth = 20.f;
-const float barHeight = 4.f;
+    const float barWidth = 20.f;
+    const float barHeight = 4.f;
 
-healthBarBack.setSize({barWidth, barHeight});
-healthBarBack.setFillColor(sf::Color(50, 50, 50));
-healthBarBack.setPosition({
-    center.x - barWidth / 2.f,
-    center.y - bounds.size.y / 2.f - 10.f
-});
+    healthBarBack.setSize({barWidth, barHeight});
+    healthBarBack.setFillColor(sf::Color(50, 50, 50));
+    healthBarBack.setPosition({center.x - barWidth / 2.f,
+                               center.y - bounds.size.y / 2.f - 10.f});
 
-healthBarFront.setPosition(healthBarBack.getPosition());
+    healthBarFront.setPosition(healthBarBack.getPosition());
 
-// Health is in 10 chunks, each chunk = 4 HP
-float ratio = std::clamp(health / 40.f, 0.f, 1.f); // Ensures ratio is between 0 and 1
+    // Health is in 10 chunks, each chunk = 4 HP
+    float ratio = std::clamp(health / 40.f, 0.f, 1.f); // Ensures ratio is between 0 and 1
 
-healthBarFront.setSize({barWidth * ratio, barHeight});
-healthBarFront.setFillColor(sf::Color::Green);
-
+    healthBarFront.setSize({barWidth * ratio, barHeight});
+    healthBarFront.setFillColor(sf::Color::Green);
 }
 
-
-
-void Boss::handleWallBounce(float dt, std::vector<EnemyBullet> &enemyBullets,sf::Vector2f pos)
+void Boss::handleWallBounce(float dt, std::vector<EnemyBullet> &enemyBullets, sf::Vector2f pos)
 {
     // accumulate shoot timer
     timeSinceLastShot += dt;
@@ -682,8 +666,6 @@ void Boss::handleWallBounce(float dt, std::vector<EnemyBullet> &enemyBullets,sf:
     nextBounds.position += velocity * dt;
 
     bool bounced = false;
-
-
 
     sf::Vector2f bossPos = sprite.getPosition();
     float distance = std::hypot(bossPos.x - pos.x, bossPos.y - pos.y);

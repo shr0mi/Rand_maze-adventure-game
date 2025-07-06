@@ -48,17 +48,22 @@ float AudioManager::getVolume() const
     return backgroundMusic.getVolume();
 }
 
-SFXManager::SFXManager() {
+// SFXManager Implementation
+SFXManager::SFXManager()
+{
     loadAllSounds();
     setVolume(volume);
 }
 
-void SFXManager::loadAllSounds() {
-    struct SFXData {
+void SFXManager::loadAllSounds()
+{
+    struct SFXData
+    {
         std::string name;
         std::string filepath;
     };
 
+    // List of sound effects with their names and file paths
     std::vector<SFXData> files = {
         {"opclick", "sfx/switch20.ogg"},
         {"onoff", "sfx/switch34.ogg"},
@@ -71,12 +76,13 @@ void SFXManager::loadAllSounds() {
         {"pldmg", "sfx/footstep_carpet_002.ogg"},
         {"enmdmg", "sfx/laserRetro_002.ogg"},
         {"respawn", "sfx/maximize_008.ogg"},
-        {"bsdmg", "sfx/footstep_concrete_002.ogg"}
-    };
+        {"bsdmg", "sfx/footstep_concrete_002.ogg"}};
 
-    for (const auto& sfx : files) {
+    for (const auto &sfx : files)
+    {
         sf::SoundBuffer buffer;
-        if (!buffer.loadFromFile(sfx.filepath)) {
+        if (!buffer.loadFromFile(sfx.filepath))
+        {
             std::cerr << "Failed to load sound: " << sfx.filepath << "\n";
             continue;
         }
@@ -84,29 +90,37 @@ void SFXManager::loadAllSounds() {
 
         // Insert sound once and get iterator + insertion status:
         auto [it, inserted] = sounds.emplace(sfx.name, sf::Sound(buffers[sfx.name]));
-        if (inserted) {
+        if (inserted)
+        {
             it->second.setVolume(volume);
         }
     }
 }
 
-void SFXManager::playSound(const std::string& name) {
+// Play sound by name
+void SFXManager::playSound(const std::string &name)
+{
     auto it = sounds.find(name);
-    if (it != sounds.end()) {
+    if (it != sounds.end())
+    {
         it->second.play();
-    } else {
+    }
+    else
+    {
         std::cerr << "Sound not found: " << name << "\n";
     }
 }
 
-void SFXManager::setVolume(float v) {
+void SFXManager::setVolume(float v)
+{
     volume = v;
-    for (auto& [_, sound] : sounds) {
-        sound.setVolume(volume);
+    for (auto &[_, sound] : sounds)
+    {
+        sound.setVolume(volume); // Set volume for each sound
     }
 }
 
-void SFXManager::playSoundWithVolume(const std::string& name, float volume)
+void SFXManager::playSoundWithVolume(const std::string &name, float volume)
 {
     auto it = sounds.find(name);
     if (it != sounds.end())
@@ -120,7 +134,7 @@ void SFXManager::playSoundWithVolume(const std::string& name, float volume)
     }
 }
 
-
-float SFXManager::getVolume() const {
+float SFXManager::getVolume() const
+{
     return volume;
 }
