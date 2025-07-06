@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 //"C:/Users/USER/Documents/SFML-3.0.0/include"
-                "C:/C++ Libraries/SFML-3.0.0/include"
+                //"S:/sfml projects/library/SFML-3.0.0/include"
+                 "C:/C++ Libraries/SFML-3.0.0/include"
             ],
             "defines": [
                 "_DEBUG",
