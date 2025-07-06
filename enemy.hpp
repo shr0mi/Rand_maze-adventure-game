@@ -1,99 +1,60 @@
 #pragma once
+
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <cmath>
 
-constexpr float PLAYER_SPEED = 100.0f;
-constexpr float ENEMY_SPEED = 100.0f;
-constexpr float SHOOT_RANGE = 400.0f;
-constexpr float Ss_speed = 200.f;
-constexpr float EXPLODE_RANGE = 25.0f;
-constexpr float BULLET_SPEED = 150.0f;
-constexpr float CHASE_RANGE = 250.0f; // Enemy chases player within 200 pixels
 
-// Normalize helper
+// === Constants ===
+constexpr float PLAYER_SPEED = 70.0f;  // Speed of the player
+constexpr float ENEMY_SPEED = 100.0f;  // Speed of enemies
+constexpr float SHOOT_RANGE = 100.0f;  // Max shooting distance for enemies
+constexpr float Ss_speed = 200.f;      // Possibly projectile or special enemy speed
+constexpr float EXPLODE_RANGE = 25.0f; // Distance at which ExploderEnemy explodes
+constexpr float BULLET_SPEED = 150.0f; // Speed of enemy bullets
+constexpr float CHASE_RANGE = 250.0f;  // ExploderEnemy starts chasing player within this range
+
+// === Helper function to normalize vectors ===
 inline sf::Vector2f normalize(sf::Vector2f v)
 {
     float len = std::sqrt(v.x * v.x + v.y * v.y);
-    return (len != 0.f) ? v / len : sf::Vector2f(0.f, 0.f);
+    return (len != 0.f) ? v / len : sf::Vector2f(0.f, 0.f); // Avoid divide by zero
 }
 
-// Bullet struct
-struct EnemyBullet
+class EnemyBullet
 {
+public:
     sf::CircleShape shape;
     sf::Vector2f velocity;
-    bool isAlive = true;
+    bool isAlive = true; // Flag to determine if bullet is still active
 
-    EnemyBullet(sf::Vector2f pos, sf::Vector2f dir)
-    {
-        shape.setRadius(2);
-        shape.setFillColor(sf::Color::Red);
-        shape.setPosition(pos);
-        velocity = normalize(dir) * BULLET_SPEED;
-    }
+    EnemyBullet(sf::Vector2f pos, sf::Vector2f dir); // Constructor
 
-    /*void update(float dt)
-    {
-        shape.move(velocity * dt);
-    }*/
+    void update(float dt, const std::vector<std::vector<int>> &collisionMap); // Move and collision check
 
-    void update(float dt, const std::vector<std::vector<int>> &collisionMap)
-    {
-        shape.move(velocity * dt);
-        sf::Vector2f pos = shape.getPosition();
-        int col = static_cast<int>(pos.x) / 16;
-        int row = static_cast<int>(pos.y) / 16;
-
-        if (row >= 0 && row < (int)collisionMap.size() &&
-            col >= 0 && col < (int)collisionMap[0].size())
-        {
-            if (collisionMap[row][col] == 1)
-            {
-                isAlive = false;
-            }
-        }
-        else
-        {
-            isAlive = false;
-        }
-    }
-
-    sf::Vector2f getPosition() const
-    {
-        return shape.getPosition();
-    }
+    sf::Vector2f getPosition() const; // Return current bullet position
 };
 
-// Base enemy class (optional if shared behavior increases)
-// class BaseEnemy
-// {
-// public:
-//     virtual void update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &bullets) = 0;
-//     virtual void draw(sf::RenderWindow &window) = 0;
-//     virtual ~BaseEnemy() = default;
-// };
-
-// enemy.hpp
 class BaseEnemy
 {
 public:
-    virtual void update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &bullets) = 0;
+    virtual void update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &bullets) = 0; // Update enemy logic
     virtual void draw(sf::RenderWindow &window) = 0;
+    virtual bool isAlive() const = 0;            // Check if enemy is still alive
+    virtual void takeDamage(int amount) = 0;     // Apply damage to enemy
+    virtual sf::FloatRect getBounds() const = 0; // Get enemy bounding box for collision
 
-    // NEW:
-    virtual bool isAlive() const = 0;
-    virtual void takeDamage(int amount) = 0;
-    virtual sf::FloatRect getBounds() const = 0;
-
-    virtual ~BaseEnemy() = default;
+    virtual ~BaseEnemy() = default; // Virtual destructor
 };
 
-// ShooterEnemy class
+// === Enemy that shoots toward the player if in range ===
 class ShooterEnemy : public BaseEnemy
 {
+    bool recentlyDamaged = false; // Flag for visual damage feedback
+    int health = 3;
+
 public:
-    ShooterEnemy(sf::Texture &texture, float x, float y);
+    ShooterEnemy(sf::Texture &texture, float x, float y); // Constructor
 
     void update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &bullets) override;
     void draw(sf::RenderWindow &window) override;
@@ -102,82 +63,49 @@ public:
     sf::FloatRect getBounds() const override;
 
 private:
-    int health = 3; // or any value
-
     sf::Sprite sprite;
-    sf::Clock shootClock;
+    sf::Clock shootClock;  // Timer for shooting
+    sf::Clock damageClock; // Timer for damage color effect
+    sf::RectangleShape healthBarBack;
+    sf::RectangleShape healthBarFront;
 };
 
-// ExploderEnemy class
-// class ExploderEnemy : public BaseEnemy
-// {
-// public:
-//     ExploderEnemy(sf::Texture &texture, float x, float y);
-
-//     void update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &bullets) override;
-//     void draw(sf::RenderWindow &window) override;
-
-// private:
-//     sf::Sprite sprite;
-//     bool active = true;
-//     sf::Clock shootClock; // ✅ Add this line
-// };
-// class ExploderEnemy : public BaseEnemy
-// {
-// public:
-//     ExploderEnemy(sf::Texture &texture, float x, float y);
-//     void update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &bullets) override;
-//     void draw(sf::RenderWindow &window) override;
-
-// private:
-//     sf::Sprite sprite;
-//     bool active = true;
-//     bool chasing = false;
-//     sf::Clock shootClock;
-// };
-// class ExploderEnemy : public BaseEnemy
-// {
-// public:
-//     ExploderEnemy(sf::Texture &texture, float x, float y);
-
-//     //void update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &bullets) override;
-//     void update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &bullets, const std::vector<std::vector<int>>& collisionMap);
-//     void draw(sf::RenderWindow &window) override;
-
-// private:
-//     sf::Sprite sprite;
-//     sf::Vector2f spawnPos;
-//     bool active = true;
-//     bool chasing = false;
-//     sf::Clock shootClock;
-// };
 class ExploderEnemy : public BaseEnemy
 {
+    bool active = true;           // Is this enemy active
+    bool chasing = false;         // Is it currently chasing the player
+    bool recentlyDamaged = false; // Flash red when hit
+    int health = 3;
+
 public:
-    ExploderEnemy(sf::Texture &texture, float x, float y);
+    ExploderEnemy(sf::Texture &texture, float x, float y); // Constructor
 
     void update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &bullets) override;
-    void update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &bullets, const std::vector<std::vector<int>> &collisionMap);
+    void update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &bullets,
+                const std::vector<std::vector<int>> &collisionMap); // Overload with collision
     void draw(sf::RenderWindow &window) override;
     bool isAlive() const override;
-void takeDamage(int amount) override;
-sf::FloatRect getBounds() const override;
-
+    void takeDamage(int amount) override;
+    sf::FloatRect getBounds() const override;
 
 private:
-    int health =3;
     sf::Sprite sprite;
-    sf::Vector2f spawnPos;
-    bool active = true;
-    bool chasing = false;
-    sf::Clock shootClock;
+    sf::Vector2f spawnPos; // Where the enemy was spawned (for range limit)
+    sf::Clock shootClock;  // Used for animation timing
+    sf::Clock damageClock; // Color effect timer
+    sf::RectangleShape healthBarBack;
+    sf::RectangleShape healthBarFront;
 };
 
-// TurretEnemy class - shoots in a circular pattern every 2 seconds
 class TurretEnemy : public BaseEnemy
 {
+    const float shootInterval = 2.0f; // Time between shooting cycles
+    const int bulletCount = 12;       // Number of bullets in radial pattern
+    bool recentlyDamaged = false;     // Visual damage feedback
+    int health = 3;
+
 public:
-    TurretEnemy(sf::Texture &texture, float x, float y);
+    TurretEnemy(sf::Texture &texture, float x, float y); // Constructor
 
     void update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &bullets) override;
     void draw(sf::RenderWindow &window) override;
@@ -186,9 +114,9 @@ public:
     sf::FloatRect getBounds() const override;
 
 private:
-    int health = 3;
-    sf::Sprite sprite;
-    sf::Clock shootClock;
-    const float shootInterval = 2.0f;
-    const int bulletCount = 12; // how many bullets per burst
+    sf::Sprite sprite;     // Visual
+    sf::Clock shootClock;  // Controls when to shoot
+    sf::Clock damageClock; // Red flash effect after hit
+    sf::RectangleShape healthBarBack;
+    sf::RectangleShape healthBarFront;
 };
