@@ -37,16 +37,18 @@ void LeaderboardScreen::loadScores()
     while (fread(&x, sizeof(int), 1, fptr) == 1)
     {
         std::cout << x << std::endl;
+        // Format the score as minutes and seconds
         std::stringstream ss;
         ss << "#" << (i + 1) << " Score: " << x / 60 << "m " << x % 60 << "s";
         std::string scoreLine = ss.str();
 
+        // Create a text object for each score
         sf::Text line(font, scoreLine, 24);
         line.setFillColor(sf::Color::Yellow);
         line.setStyle(sf::Text::Bold);
         line.setPosition({3280.0f, y + i * 40});
 
-        scoreTexts.push_back(line);
+        scoreTexts.push_back(line); // Store the text object in the vector
         i++;
     }
     fclose(fptr);
@@ -62,8 +64,17 @@ void LeaderboardScreen::draw(sf::RenderWindow &window)
     window.draw(background);
     window.draw(leaderboardImage);
     window.draw(backButton);
+
+    // Draw all score texts
     for (auto &text : scoreTexts)
     {
         window.draw(text);
     }
 }
+
+void LeaderboardScreen::reload()
+{
+    scoreTexts.clear(); // Clear previous texts
+    loadScores();       // Reload from file
+}
+

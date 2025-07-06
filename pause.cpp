@@ -1,25 +1,20 @@
 #include "pause.hpp"
 #include "audio.hpp"
 
-PauseMenu::PauseMenu() : // bgTexture("assets/menubg.png"),
-                         pauseTexture("assets/ui_pause_menu_title.png"),
+PauseMenu::PauseMenu() : pauseTexture("assets/ui_pause_menu_title.png"),
                          musicOnTexture("assets/ui_music_btn_on.png"),
                          musicOffTexture("assets/ui_music_btn_off.png"),
                          menuTexture("assets/MenuButton.png"),
                          resumeTexture("assets/ResumeButton.png"),
 
-                         // background(bgTexture),
                          pauseTitle(pauseTexture),
                          musicOnButton(musicOnTexture),
                          musicOffButton(musicOffTexture),
                          menuButton(menuTexture),
                          resumeButton(resumeTexture),
 
-                         slider(320, 350, 400)
+                         slider(320, 350, 400) // Initialize the slider with position (320, 350) and width 400
 {
-
-    // background.setPosition({-100, 50});
-    // background.setScale({1.3f, 1.3f});
 
     pauseTitle.setPosition({270, 200});
     pauseTitle.setScale({0.4f, 0.4f});
@@ -39,8 +34,8 @@ PauseMenu::PauseMenu() : // bgTexture("assets/menubg.png"),
 
 void PauseMenu::handleEvent(const sf::Event &event, const sf::RenderWindow &window, AudioManager &audioManager)
 {
-    slider.handleEvent(event, window);
-    audioManager.setVolume(slider.getVolume());
+    slider.handleEvent(event, window);          // Handle slider events
+    audioManager.setVolume(slider.getVolume()); // Sync audio volume with slider
 
     if (event.is<sf::Event::MouseButtonPressed>())
     {
@@ -48,20 +43,24 @@ void PauseMenu::handleEvent(const sf::Event &event, const sf::RenderWindow &wind
 
         if (musicOnButton.getGlobalBounds().contains(pos) || musicOffButton.getGlobalBounds().contains(pos))
         {
-            audioManager.toggleMusic();
+            audioManager.toggleMusic(); // Toggle music on/off
         }
     }
 }
 
 void PauseMenu::draw(sf::RenderWindow &window, AudioManager &audioManager)
 {
-    // window.draw(background);
     window.draw(pauseTitle);
 
+    // Draw the music button based on the current state
     if (audioManager.isMusicOn())
+    {
         window.draw(musicOnButton);
+    }
     else
+    {
         window.draw(musicOffButton);
+    }
 
     window.draw(menuButton);
     window.draw(resumeButton);

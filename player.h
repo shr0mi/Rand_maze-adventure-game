@@ -51,7 +51,7 @@ private:
     const sf::Vector2f normalViewSize{500.f, 500.f};                                  // your normal view size
     const sf::Vector2f cheatViewSize{normalViewSize.x * 5.f, normalViewSize.y * 5.f}; // wider cheat view
 
-    int health = 15;
+    int health = 200;
     float invincibleTimer = 0.2f;
     const float INVINCIBLE_TIME = 2.0f;
 

@@ -11,6 +11,7 @@ public:
     LeaderboardScreen();
     void draw(sf::RenderWindow &window);
     bool backClicked(sf::Vector2f pos);
+    void reload(); // Reload scores from the file
 
 private:
     void loadScores();

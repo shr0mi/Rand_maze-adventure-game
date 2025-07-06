@@ -13,6 +13,7 @@
 #include "timer.h"
 #include "pause.hpp"
 #include "leaderboard.hpp"
+#include "controls.hpp"
 
 std::vector<std::shared_ptr<BaseEnemy>> enemies;
 sf::Texture texture;
@@ -83,13 +84,18 @@ void runGame(sf::RenderWindow &window)
     pauseMenu.syncWithAudio(audioManager);
 
     sf::Clock clock;
-    bool isPaused = false;
-    bool firstTime = true;
-    bool isLeaderboardOpen = false;
-    bool isOver = false;
+    bool isPaused = false; // Variable for pausing game
+    bool firstTime = true; // Variable to check if leaderboard is opened for the first time
+    bool isOver = false; // Variable to check if game is over
 
     if (!texture.loadFromFile("colored-transparent.png"))
-        return;
+    {
+        return; // Failed to load texture
+    }
+    // Level Vector
+    // Trees -> 50, 51, 52, 53, 54, 55
+    // Walls -> 19, 20, 21, 68, *69, 70, 117, 118, 119
+    // Floor -> 2, 3, 4, 5
 
     BSP_algorithm bsp;
     std::vector<std::vector<int>> level = bsp.generate_bsp_map(100, 100);
@@ -176,17 +182,20 @@ void runGame(sf::RenderWindow &window)
             if (chest.isOpened() && firstTime)
             {
                 OpenLeaderboard(gameTimer);
-                firstTime = false;
+                firstTime = false; // Ensure leaderboard is opened only once
+                isOver = true; // Set game over state
             }
 
-            // Press X to WinMenu
-            if (event->is<sf::Event::KeyPressed>())
-            {
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X))
-                {
-                    isOver = !isOver;
-                }
-            }
+            // If you want to end the game instantly- just click X button!
+            // if (event->is<sf::Event::KeyPressed>())
+            // {
+            //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X))
+            //     {
+            //         OpenLeaderboard(gameTimer);
+            //         firstTime = false; // Ensure leaderboard is opened only once
+            //         isOver = true;
+            //     }
+            // }
 
             if (isOver)
             {
@@ -198,7 +207,7 @@ void runGame(sf::RenderWindow &window)
                 int totalSeconds = gameTimer.get_minutes() * 60 + gameTimer.get_seconds();
                 std::stringstream ss;
                 ss << "Your Time: " << gameTimer.get_minutes() << " m " << gameTimer.get_seconds() << " s";
-                timeText.setString(ss.str());
+                timeText.setString(ss.str()); // Set time text
 
                 if (event->is<sf::Event::MouseButtonPressed>())
                 {
@@ -214,9 +223,9 @@ void runGame(sf::RenderWindow &window)
         // Pause
         gameTimer.update(dt, isPaused, isOver);
 
-        if (!isPaused && !isOver)
+        if (!isPaused && !isOver) // Only update game logic if not paused or over
         {
-            player.cheatlook(window, dt);
+            player.cheatlook(window, dt); // Handle cheat mode camera
 
             for (auto &enemy : enemies)
             {
@@ -231,10 +240,10 @@ void runGame(sf::RenderWindow &window)
                 }
             }
 
-            // MISSING:
+            // Update enemy bullets
             for (auto it = enemyBullets.begin(); it != enemyBullets.end();)
             {
-                it->update(dt, collisionMap);
+                it->update(dt, collisionMap); // Move and check for collisions
                 if (!it->isAlive)
                 {
                     it = enemyBullets.erase(it); // remove bullet
@@ -248,7 +257,7 @@ void runGame(sf::RenderWindow &window)
             // Enemy Damage
             for (auto it = playerBullets.begin(); it != playerBullets.end();)
             {
-                bool hit = false;
+                bool hit = false; // Flag to check if bullet hit an enemy
                 for (auto &enemy : enemies)
                 {
                     if (enemy->isAlive() && it->getBounds().findIntersection(enemy->getBounds()).has_value())
@@ -315,6 +324,7 @@ void runGame(sf::RenderWindow &window)
             pauseMenu.draw(window, audioManager);
         }
 
+        // Draw Win Screen
         if (isOver)
         {
             window.setView(window.getDefaultView()); // Reset view for overlay
@@ -328,11 +338,8 @@ void runGame(sf::RenderWindow &window)
     }
 }
 
-void LeaderBoardTest();
-
 int main()
 {
-    LeaderBoardTest();
     sf::RenderWindow window(sf::VideoMode({960, 540}), "Main Menu", sf::Style::None);
     window.setFramerateLimit(60);
 
@@ -340,6 +347,7 @@ int main()
     MenuScreen menu;
     OptionsScreen options(audioManager);
     LeaderboardScreen leaderboard;
+    ControlsScreen controls;
     CreditsScreen credits;
 
     Scene scene = Scene::Menu;
@@ -382,6 +390,14 @@ int main()
                         scene = Scene::Leaderboard;
                         viewManager.setView(Scene::Leaderboard);
                         options.syncWithAudio(audioManager);
+
+                        leaderboard.reload(); // RELOAD SCORE DATA 
+                    }
+                    else if (menu.controlClick(pos))
+                    {
+                        scene = Scene::Controls;
+                        viewManager.setView(Scene::Controls);
+                        options.syncWithAudio(audioManager);
                     }
                     else if (menu.exitClick(pos))
                     {
@@ -408,6 +424,11 @@ int main()
                     scene = Scene::Menu;
                     viewManager.setView(Scene::Menu);
                 }
+                else if (scene == Scene::Controls && controls.backClicked(pos))
+                {
+                    scene = Scene::Menu;
+                    viewManager.setView(Scene::Menu);
+                }
                 else if (scene == Scene::Credits && credits.backClicked(pos))
                 {
                     scene = Scene::Options;
@@ -430,6 +451,10 @@ int main()
         else if (scene == Scene::Leaderboard)
         {
             leaderboard.draw(window);
+        }
+        else if (scene == Scene::Controls)
+        {
+            controls.draw(window);
         }
         else if (scene == Scene::Credits)
         {
@@ -466,17 +491,5 @@ void OpenLeaderboard(GameTimer &gameTimer)
         fwrite(&top_seven_scores[i], sizeof(int), 1, fptr);
         cout << top_seven_scores[i] << endl;
     }
-    fclose(fptr);
-}
-
-void LeaderBoardTest()
-{
-    FILE *fptr;
-    fptr = fopen("scoreboard.dat", "wb");
-    int num1 = 120, num2 = 220, num3 = 330, num4 = 440;
-    fwrite(&num1, sizeof(int), 1, fptr);
-    fwrite(&num2, sizeof(int), 1, fptr);
-    fwrite(&num3, sizeof(int), 1, fptr);
-    fwrite(&num4, sizeof(int), 1, fptr);
     fclose(fptr);
 }

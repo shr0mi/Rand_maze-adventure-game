@@ -9,6 +9,7 @@ GameTimer::GameTimer() : totalTime(0.0f), timerText(font, "", 30)
         std::cerr << "Failed to load font!" << std::endl;
     }
 
+    // Initialize timerText properties
     timerText.setFillColor(sf::Color::White);
     timerText.setOutlineColor(sf::Color::Black);
     timerText.setOutlineThickness(2);
@@ -19,17 +20,21 @@ void GameTimer::update(float dt, bool isPaused, bool isOver)
 {
     if (!isPaused && !isOver) // Only update time if not paused or game over
     {
-        totalTime += dt;
-        updateText();
+        totalTime += dt; // Increment total time by delta time
+        updateText(); // Update the text with the new time
     }
 }
 
 void GameTimer::updateText()
 {
+    // Convert totalTime to minutes and seconds
     int totalSeconds = static_cast<int>(totalTime);
     int minutes = totalSeconds / 60;
     int seconds = totalSeconds % 60;
 
+    // Format the time as MM:SS
+    // Using stringstream for formatting
+    // This ensures leading zeros for single-digit minutes and seconds
     std::stringstream ss;
     ss << "Time: ";
     ss << (minutes < 10 ? "0" : "") << minutes << ":";

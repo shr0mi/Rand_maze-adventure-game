@@ -2,7 +2,7 @@
 #include "audio.hpp"
 
 SliderVolume::SliderVolume(float x, float y, float width)
-    : isDragging(false), volumeText(font, "", 18)
+    : isDragging(false), volumeText(font, "", 18) // Initialize the font and text size
 {
     bar.setSize(sf::Vector2f(width, 5));
     bar.setFillColor(sf::Color(150, 150, 255));
@@ -18,7 +18,7 @@ SliderVolume::SliderVolume(float x, float y, float width)
 
     if (!font.openFromFile("assets/arial.ttf"))
     {
-        // Fallback: just ignore text rendering!
+        // error
     }
 
     volumeText.setFillColor(sf::Color::White);
@@ -26,7 +26,7 @@ SliderVolume::SliderVolume(float x, float y, float width)
     // Initial knob position to match default volume
     float defaultVolume = 20.f;
     float initialX = minX + (defaultVolume / 100.f) * (maxX - minX);
-    knob.setPosition({initialX, y + bar.getSize().y / 2});
+    knob.setPosition({initialX, y + bar.getSize().y / 2}); // Set initial knob position based on default volume
 
     updateText();
 }
@@ -39,14 +39,17 @@ void SliderVolume::handleEvent(const sf::Event &event, const sf::RenderWindow &w
         {
             sf::Vector2i pixel(mousePressed->position.x, mousePressed->position.y);
             sf::Vector2f mousePos = window.mapPixelToCoords(pixel);
+
+            // Check if the mouse is pressed on the knob
             if (knob.getGlobalBounds().contains(mousePos))
             {
-                isDragging = true;
+                isDragging = true; 
             }
         }
     }
     else if (const auto *mouseReleased = event.getIf<sf::Event::MouseButtonReleased>())
     {
+        // Stop dragging if the left mouse button is released
         if (mouseReleased->button == sf::Mouse::Button::Left)
         {
             isDragging = false;
@@ -65,7 +68,7 @@ void SliderVolume::handleEvent(const sf::Event &event, const sf::RenderWindow &w
 
 void SliderVolume::updateText()
 {
-    int volume = static_cast<int>(getVolume());
+    int volume = static_cast<int>(getVolume()); // Get volume as an integer
     volumeText.setString(std::to_string(volume));
 
     // Center text above knob
@@ -76,10 +79,12 @@ void SliderVolume::updateText()
 
 void SliderVolume::updateKnobPosition(float mouseX)
 {
+    // Clamp the mouse position to the slider's range
     float x = std::clamp(mouseX, minX, maxX);
     knob.setPosition({x, bar.getPosition().y + bar.getSize().y / 2});
     updateText();
 
+    // Update the volume text position
     if (audio)
     {
         audio->setVolume(getVolume());
@@ -95,6 +100,7 @@ float SliderVolume::getVolume() const
 
 void SliderVolume::setVolume(float volume)
 {
+    // Ensure volume is within the range [0, 100]
     float x = minX + (std::clamp(volume, 0.f, 100.f) / 100.f) * (maxX - minX);
     knob.setPosition({x, bar.getPosition().y + bar.getSize().y / 2});
     updateText();
@@ -123,7 +129,7 @@ OptionsScreen::OptionsScreen(AudioManager &audioManager) : bgTexture("assets/men
                                                            musicOnButton(musicOnTexture),
                                                            musicOffButton(musicOffTexture),
 
-                                                           slider(1250, 150, 400)
+                                                           slider(1250, 150, 400) // Initialize the slider with position (1250, 150) and width 400
 {
     background.setPosition({960, 0});
 
@@ -152,10 +158,7 @@ OptionsScreen::OptionsScreen(AudioManager &audioManager) : bgTexture("assets/men
 
 void OptionsScreen::syncWithAudio(AudioManager &audioManager)
 {
-    // if (audio)
-    // {
-    //     slider.setVolume(audio->getVolume());
-    // }
+    // Sync the slider with the current audio volume
     slider.setVolume(audioManager.getVolume());
 }
 
@@ -169,7 +172,7 @@ void OptionsScreen::handleEvent(const sf::Event &event, const sf::RenderWindow &
         sf::Vector2f pos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
         if (musicOnButton.getGlobalBounds().contains(pos) || musicOffButton.getGlobalBounds().contains(pos))
         {
-            audioManager.toggleMusic();
+            audioManager.toggleMusic(); // Toggle music on/off
             syncWithAudio(audioManager); // Update slider and toggle display
         }
     }
@@ -193,6 +196,7 @@ void OptionsScreen::draw(sf::RenderWindow &window)
     window.draw(creditsButton);
     window.draw(backButton);
 
+    // Draw the music button based on the current state
     if (audio && audio->isMusicOn())
     {
         window.draw(musicOnButton);

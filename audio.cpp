@@ -20,6 +20,7 @@ AudioManager::AudioManager()
 
 void AudioManager::toggleMusic()
 {
+    // Toggle the music state
     if (musicOn)
     {
         backgroundMusic.pause();

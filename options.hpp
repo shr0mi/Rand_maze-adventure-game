@@ -24,13 +24,13 @@ private:
     sf::CircleShape knob;
     sf::Font font;
     sf::Text volumeText;
-    bool isDragging;
+    bool isDragging; // Flag to check if the knob is being dragged
 
     float minX, maxX;
 
     void updateKnobPosition(float mouseX);
 
-    AudioManager *audio = nullptr;
+    AudioManager *audio = nullptr; // Pointer to AudioManager for volume control
 
     void updateText();
 };
@@ -48,10 +48,10 @@ public:
 private:
     sf::Texture bgTexture, optionTexture, musicTexture, backTexture, creditsTexture, musicOnTexture, musicOffTexture;
     sf::Sprite background, optionImage, musicImage, backButton, creditsButton, musicOnButton, musicOffButton;
-    bool musicOn = true;
-    SliderVolume slider;
+    bool musicOn = true; // Track music state
+    SliderVolume slider; // Slider for volume control
 
-    AudioManager *audio = nullptr;
+    AudioManager *audio = nullptr; // Pointer to AudioManager for volume control
 };
 
 #endif

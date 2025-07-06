@@ -384,11 +384,15 @@ void handleShooting(std::vector<Bullet> &bullets, sf::Texture &tex, const sf::Ve
     wasMousePressed = isMousePressed;
 }
 
-/*void updateBullets(std::vector<Bullet>& bullets, float dt, const sf::RenderWindow& window) {
-    for (auto& bullet : bullets) {
+/*
+void updateBullets(std::vector<Bullet>& bullets, float dt, const sf::RenderWindow& window)
+{
+    for (auto& bullet : bullets)
+    {
         bullet.update(dt);
     }
-}*/
+}
+*/
 
 void updateBullets(std::vector<Bullet> &bullets, float dt, const sf::RenderWindow &window, GameInfo &gi)
 {
