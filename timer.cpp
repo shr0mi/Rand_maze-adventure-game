@@ -40,7 +40,7 @@ void GameTimer::updateText()
     ss << (minutes < 10 ? "0" : "") << minutes << ":";
     ss << (seconds < 10 ? "0" : "") << seconds;
 
-    ss << "   |   Keys: " << keyCount; // <-- ADD KEYS
+    ss << "   |   Keys: " << keyCount << " / 3"; // <-- ADD KEYS
     timerText.setString(ss.str());
 }
 
@@ -67,7 +67,7 @@ int GameTimer::get_seconds()
     int seconds = totalSeconds % 60;
     return seconds;
 }
-void GameTimer::setKeyCount(int count) // <-- NEW
+void GameTimer::setKeyCount(int count) // Set the number of keys collected
 {
     keyCount = count;
     updateText(); // Update text immediately

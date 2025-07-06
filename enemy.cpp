@@ -3,7 +3,6 @@
 #include <sstream> // for std::stringstream
 #include "audio.hpp"
 
-
 // Constructor: Initializes bullet shape, color, position, and velocity
 EnemyBullet::EnemyBullet(sf::Vector2f pos, sf::Vector2f dir)
 {
@@ -122,12 +121,6 @@ sf::FloatRect ShooterEnemy::getBounds() const
     return sprite.getGlobalBounds();
 }
 
-
-
-
-
-
-
 // Constructor: Setup sprite and store spawn position
 ExploderEnemy::ExploderEnemy(sf::Texture &tex, float x, float y)
     : sprite(tex, sf::IntRect({(19 - 1) * 17, (8 - 1) * 17}, {16, 16})),
@@ -227,7 +220,7 @@ void ExploderEnemy::draw(sf::RenderWindow &window)
     }
 }
 
-// Dummy update to satisfy interface
+// Update without collision map: Default to empty map
 void ExploderEnemy::update(float dt, const sf::Vector2f &playerPos, std::vector<EnemyBullet> &bullets)
 {
     static std::vector<std::vector<int>> emptyMap;
@@ -260,9 +253,6 @@ sf::FloatRect ExploderEnemy::getBounds() const
 {
     return sprite.getGlobalBounds();
 }
-
-
-
 
 // Constructor: Initialize turret position and sprite
 TurretEnemy::TurretEnemy(sf::Texture &tex, float x, float y)
@@ -344,4 +334,3 @@ sf::FloatRect TurretEnemy::getBounds() const
 {
     return sprite.getGlobalBounds();
 }
-

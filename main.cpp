@@ -15,15 +15,14 @@
 #include "leaderboard.hpp"
 #include "controls.hpp"
 
-
 std::vector<std::shared_ptr<BaseEnemy>> enemies;
 sf::Texture texture;
 std::vector<Key> keys;
 sf::Vector2f pos;
 sf::Vector2f chest_pos, boss_pos;
 
-AudioManager audioManager;
-SFXManager sfx;
+AudioManager audioManager; // Audio manager for background music
+SFXManager sfx; // Sound effects manager
 
 void OpenLeaderboard(GameTimer &gameTimer);
 
@@ -86,7 +85,6 @@ void runGame(sf::RenderWindow &window)
     pauseMenu.syncWithAudio(audioManager);
     window.setMouseCursorVisible(false);
 
-
     sf::Clock clock;
     bool isPaused = false; // Variable for pausing game
     bool firstTime = true; // Variable to check if leaderboard is opened for the first time
@@ -105,7 +103,7 @@ void runGame(sf::RenderWindow &window)
     std::vector<std::vector<int>> level = bsp.generate_bsp_map(100, 100);
     std::vector<std::vector<int>> collisionMap = generateCollisionMap(level, texture);
 
-    // Test
+    // Game info and game objects
     GameInfo gameinfo(collisionMap, texture);
     Chest chest(gameinfo);
     chest.setpos(chest_pos);
@@ -146,14 +144,6 @@ void runGame(sf::RenderWindow &window)
     timeText.setFillColor(sf::Color::Yellow);
     timeText.setPosition({300, 500}); // Adjust to position text below the sprite
 
-    // --- Added Key Counter Text ---
-    // sf::Text keyCounterText(font,"Keys: 0 / 0", 30);
-    // keyCounterText.setFont(font);
-    // keyCounterText.setCharacterSize(30);
-    // keyCounterText.setFillColor(sf::Color::Yellow);
-    // keyCounterText.setPosition({200.f, 10.f});
-    // -----------------------------
-
     while (window.isOpen())
     {
         while (std::optional event = window.pollEvent())
@@ -172,15 +162,15 @@ void runGame(sf::RenderWindow &window)
                 }
             }
 
+            // Handle Pause Menu Events
             if (isPaused)
             {
                 pauseMenu.handleEvent(*event, window, audioManager);
-                window.setMouseCursorVisible(true);
-
+                window.setMouseCursorVisible(true); // Show mouse cursor when paused
 
                 if (event->is<sf::Event::MouseButtonPressed>())
                 {
-                    sfx.playSound("opclick");
+                    sfx.playSound("opclick"); // Play click sound on mouse button press
                     sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
                     if (pauseMenu.isResumeClicked(mousePos))
                     {
@@ -194,8 +184,12 @@ void runGame(sf::RenderWindow &window)
                     }
                 }
             }
-            
-            if(!isPaused){window.setMouseCursorVisible(false);} 
+
+            // Mouse cursor visibility
+            if (!isPaused)
+            {
+                window.setMouseCursorVisible(false);
+            }
 
             // If Game is Over then write it to Leaderboard
             if (chest.isOpened() && firstTime)
@@ -281,7 +275,7 @@ void runGame(sf::RenderWindow &window)
                 {
                     if (enemy->isAlive() && it->getBounds().findIntersection(enemy->getBounds()).has_value())
                     {
-                        sfx.playSoundWithVolume("enmdmg",10);
+                        sfx.playSoundWithVolume("enmdmg", 10);
                         enemy->takeDamage(1); // Adjust damage if needed
                         hit = true;
                         break;
@@ -310,30 +304,17 @@ void runGame(sf::RenderWindow &window)
             updateBullets(playerBullets, dt, window, gameinfo);
 
             player.update(dt, enemyBullets, window, enemies, pos, boss.getBounds(), chest.isOpened());
-            boss.update(dt, window, playerBullets, enemyBullets,player.getPosition());
+            boss.update(dt, window, playerBullets, enemyBullets, player.getPosition());
             handleKeyChestInteraction(keys, chest, player.getPosition(), gameinfo);
             crosshair.update(window);
 
-            // --- Update key counter string here ---
-            // int collectedCount = 0;
-            // for (const auto &key : keys)
-            // {
-            //     if (key.isCollected())
-            //         collectedCount++;
-            // }
-            // std::stringstream ss;
-            // ss << "Keys: " << collectedCount << " / " << keys.size();
-            // keyCounterText.setString(ss.str());
-            // --------------------------------------
-            // --- CHANGED: Count collected keys and update timer ---
             int collectedKeyCount = 0;
             for (const auto &key : keys)
             {
                 if (key.isCollected())
                     collectedKeyCount++;
             }
-            gameTimer.setKeyCount(collectedKeyCount); // <== ADDED
-            // ------------------------------------------------------
+            gameTimer.setKeyCount(collectedKeyCount); // Set key count in timer
         }
 
         window.clear();
@@ -377,17 +358,6 @@ void runGame(sf::RenderWindow &window)
             window.display();
             continue; // Skip remaining rendering
         }
-        // Draw key count text on top of everything using default view
-        //         sf::View currentView = window.getView();
-        //         sf::Vector2f center = currentView.getCenter();
-        //         //sf::Vector2f size = currentView.getSize();
-
-        // // Position keyCounterText at top-left of the view (some offset)
-        //         keyCounterText.setPosition(sf::Vector2f(center.x / 2 + 10.f, center.y/ 2 + 10.f));
-
-        // Then draw without changing view
-        // window.draw(keyCounterText);
-
         window.display();
     }
 }
@@ -420,7 +390,7 @@ int main()
             {
                 sf::Vector2f pos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
                 sfx.playSound("opclick");
-                
+
                 if (scene == Scene::Menu)
                 {
                     if (menu.playClick(pos))

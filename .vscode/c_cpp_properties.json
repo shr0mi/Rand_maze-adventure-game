@@ -4,8 +4,8 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                //"C:/Users/USER/Documents/SFML-3.0.0/include"
-                "C:/C++ Libraries/SFML-3.0.0/include"
+                //"C:/Users/USER/Documents/SFML-3.0.0/include" // Siam
+                "C:/C++ Libraries/SFML-3.0.0/include" // Partho
             ],
             "defines": [
                 "_DEBUG",
