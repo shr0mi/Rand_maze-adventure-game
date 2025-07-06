@@ -15,6 +15,7 @@
 #include "leaderboard.hpp"
 #include "controls.hpp"
 
+
 std::vector<std::shared_ptr<BaseEnemy>> enemies;
 sf::Texture texture;
 std::vector<Key> keys;
@@ -22,6 +23,7 @@ sf::Vector2f pos;
 sf::Vector2f chest_pos, boss_pos;
 
 AudioManager audioManager;
+SFXManager sfx;
 
 void OpenLeaderboard(GameTimer &gameTimer);
 
@@ -82,6 +84,8 @@ void runGame(sf::RenderWindow &window)
     GameTimer gameTimer;
     PauseMenu pauseMenu;
     pauseMenu.syncWithAudio(audioManager);
+    window.setMouseCursorVisible(false);
+
 
     sf::Clock clock;
     bool isPaused = false; // Variable for pausing game
@@ -171,20 +175,27 @@ void runGame(sf::RenderWindow &window)
             if (isPaused)
             {
                 pauseMenu.handleEvent(*event, window, audioManager);
+                window.setMouseCursorVisible(true);
+
 
                 if (event->is<sf::Event::MouseButtonPressed>())
                 {
+                    sfx.playSound("opclick");
                     sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
                     if (pauseMenu.isResumeClicked(mousePos))
                     {
+                        sfx.playSound("opclick");
                         isPaused = false;
                     }
                     else if (pauseMenu.isMenuClicked(mousePos))
                     {
+                        sfx.playSound("opclick");
                         return; // Back to main menu
                     }
                 }
             }
+            
+            if(!isPaused){window.setMouseCursorVisible(false);} 
 
             // If Game is Over then write it to Leaderboard
             if (chest.isOpened() && firstTime)
@@ -270,6 +281,7 @@ void runGame(sf::RenderWindow &window)
                 {
                     if (enemy->isAlive() && it->getBounds().findIntersection(enemy->getBounds()).has_value())
                     {
+                        sfx.playSoundWithVolume("enmdmg",10);
                         enemy->takeDamage(1); // Adjust damage if needed
                         hit = true;
                         break;
@@ -298,7 +310,7 @@ void runGame(sf::RenderWindow &window)
             updateBullets(playerBullets, dt, window, gameinfo);
 
             player.update(dt, enemyBullets, window, enemies, pos, boss.getBounds(), chest.isOpened());
-            boss.update(dt, window, playerBullets, enemyBullets);
+            boss.update(dt, window, playerBullets, enemyBullets,player.getPosition());
             handleKeyChestInteraction(keys, chest, player.getPosition(), gameinfo);
             crosshair.update(window);
 
@@ -407,7 +419,8 @@ int main()
             if (event->is<sf::Event::MouseButtonPressed>())
             {
                 sf::Vector2f pos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-
+                sfx.playSound("opclick");
+                
                 if (scene == Scene::Menu)
                 {
                     if (menu.playClick(pos))

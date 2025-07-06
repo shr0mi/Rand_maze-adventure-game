@@ -1,6 +1,7 @@
 #include "enemy.hpp"
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <sstream> // for std::stringstream
+#include "audio.hpp"
 
 
 // Constructor: Initializes bullet shape, color, position, and velocity
@@ -162,6 +163,7 @@ void ExploderEnemy::update(float dt, const sf::Vector2f &playerPos, std::vector<
     // Explode if player is close
     if (distToPlayer < EXPLODE_RANGE)
     {
+        sfx.playSound("explode");
         active = false;
         sprite.setColor(sf::Color::Transparent);
         return;
