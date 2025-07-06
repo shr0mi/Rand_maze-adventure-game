@@ -86,7 +86,7 @@ void runGame(sf::RenderWindow &window)
     sf::Clock clock;
     bool isPaused = false; // Variable for pausing game
     bool firstTime = true; // Variable to check if leaderboard is opened for the first time
-    bool isOver = false; // Variable to check if game is over
+    bool isOver = false;   // Variable to check if game is over
 
     if (!texture.loadFromFile("colored-transparent.png"))
     {
@@ -142,15 +142,13 @@ void runGame(sf::RenderWindow &window)
     timeText.setFillColor(sf::Color::Yellow);
     timeText.setPosition({300, 500}); // Adjust to position text below the sprite
 
-
-     // --- Added Key Counter Text ---
-    sf::Text keyCounterText(font,"Keys: 0 / 0", 30);
-    keyCounterText.setFont(font);
-    keyCounterText.setCharacterSize(30);
-    keyCounterText.setFillColor(sf::Color::Yellow);
-    keyCounterText.setPosition({200.f, 10.f});
+    // --- Added Key Counter Text ---
+    // sf::Text keyCounterText(font,"Keys: 0 / 0", 30);
+    // keyCounterText.setFont(font);
+    // keyCounterText.setCharacterSize(30);
+    // keyCounterText.setFillColor(sf::Color::Yellow);
+    // keyCounterText.setPosition({200.f, 10.f});
     // -----------------------------
-
 
     while (window.isOpen())
     {
@@ -193,7 +191,7 @@ void runGame(sf::RenderWindow &window)
             {
                 OpenLeaderboard(gameTimer);
                 firstTime = false; // Ensure leaderboard is opened only once
-                isOver = true; // Set game over state
+                isOver = true;     // Set game over state
             }
 
             // If you want to end the game instantly- just click X button!
@@ -304,18 +302,26 @@ void runGame(sf::RenderWindow &window)
             handleKeyChestInteraction(keys, chest, player.getPosition(), gameinfo);
             crosshair.update(window);
 
-
             // --- Update key counter string here ---
-            int collectedCount = 0;
+            // int collectedCount = 0;
+            // for (const auto &key : keys)
+            // {
+            //     if (key.isCollected())
+            //         collectedCount++;
+            // }
+            // std::stringstream ss;
+            // ss << "Keys: " << collectedCount << " / " << keys.size();
+            // keyCounterText.setString(ss.str());
+            // --------------------------------------
+            // --- CHANGED: Count collected keys and update timer ---
+            int collectedKeyCount = 0;
             for (const auto &key : keys)
             {
                 if (key.isCollected())
-                    collectedCount++;
+                    collectedKeyCount++;
             }
-            std::stringstream ss;
-            ss << "Keys: " << collectedCount << " / " << keys.size();
-            keyCounterText.setString(ss.str());
-            // --------------------------------------
+            gameTimer.setKeyCount(collectedKeyCount); // <== ADDED
+            // ------------------------------------------------------
         }
 
         window.clear();
@@ -355,13 +361,20 @@ void runGame(sf::RenderWindow &window)
             window.draw(timeText);
 
             // Draw key count on win screen as well
-            window.draw(keyCounterText);
+            // window.draw(keyCounterText);
             window.display();
             continue; // Skip remaining rendering
         }
         // Draw key count text on top of everything using default view
-        window.setView(window.getDefaultView());
-        window.draw(keyCounterText);
+        //         sf::View currentView = window.getView();
+        //         sf::Vector2f center = currentView.getCenter();
+        //         //sf::Vector2f size = currentView.getSize();
+
+        // // Position keyCounterText at top-left of the view (some offset)
+        //         keyCounterText.setPosition(sf::Vector2f(center.x / 2 + 10.f, center.y/ 2 + 10.f));
+
+        // Then draw without changing view
+        // window.draw(keyCounterText);
 
         window.display();
     }
@@ -420,7 +433,7 @@ int main()
                         viewManager.setView(Scene::Leaderboard);
                         options.syncWithAudio(audioManager);
 
-                        leaderboard.reload(); // RELOAD SCORE DATA 
+                        leaderboard.reload(); // RELOAD SCORE DATA
                     }
                     else if (menu.controlClick(pos))
                     {

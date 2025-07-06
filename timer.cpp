@@ -21,7 +21,7 @@ void GameTimer::update(float dt, bool isPaused, bool isOver)
     if (!isPaused && !isOver) // Only update time if not paused or game over
     {
         totalTime += dt; // Increment total time by delta time
-        updateText(); // Update the text with the new time
+        updateText();    // Update the text with the new time
     }
 }
 
@@ -40,6 +40,7 @@ void GameTimer::updateText()
     ss << (minutes < 10 ? "0" : "") << minutes << ":";
     ss << (seconds < 10 ? "0" : "") << seconds;
 
+    ss << "   |   Keys: " << keyCount; // <-- ADD KEYS
     timerText.setString(ss.str());
 }
 
@@ -65,4 +66,9 @@ int GameTimer::get_seconds()
     int totalSeconds = static_cast<int>(totalTime);
     int seconds = totalSeconds % 60;
     return seconds;
+}
+void GameTimer::setKeyCount(int count) // <-- NEW
+{
+    keyCount = count;
+    updateText(); // Update text immediately
 }

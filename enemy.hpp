@@ -3,37 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <cmath>
-#include <iostream>
 
-// Key counter text for UI display
-inline sf::Font keyFont;
-inline sf::Text keyText(keyFont, "Keys: 0", 20);
-
-// Initialize font and text for key counter
-inline void initializeKeyCounter()
-{
-    if (!keyFont.openFromFile("assets/arial.ttf"))
-    {
-        std::cerr << "Failed to load font for key counter!" << std::endl;
-    }
-
-    //keyText.setFont(keyFont);
-    keyText.setCharacterSize(20);
-    keyText.setFillColor(sf::Color::White);
-    keyText.setPosition({10.f, 10.f}); // Top-left corner
-}
-
-// Update the text string for keys collected
-inline void updateKeyCounterText(int count)
-{
-    keyText.setString("Keys: " + std::to_string(count));
-}
-
-// Draw the key counter text on the window
-inline void drawKeyCounter(sf::RenderWindow &window)
-{
-    window.draw(keyText);
-}
 
 // === Constants ===
 constexpr float PLAYER_SPEED = 70.0f;  // Speed of the player

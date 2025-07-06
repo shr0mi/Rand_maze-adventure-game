@@ -11,6 +11,13 @@ Player::Player(sf::Texture &tex, int row, int col, std::vector<std::vector<int>>
     gi = &gameInfo;
     gameInfo.collMap = collisionMap;
     gameInfo.pltex = tex;
+
+    // Inside Player constructor, after sprite setup
+    healthBarBack.setSize({32.f, 4.f});                   // wider than enemies
+    healthBarBack.setFillColor(sf::Color(100, 100, 100)); // dark gray
+
+    healthBarFront.setSize({32.f, 4.f});
+    healthBarFront.setFillColor(sf::Color::Green);
 }
 
 void Player::setPos(sf::Vector2f pos)
@@ -236,11 +243,33 @@ void Player::update(float dt, std::vector<EnemyBullet> &enemyBullets, sf::Render
         sprite.move(move);  // apply movement
     }
     cameraCenter += (sprite.getPosition() - cameraCenter) * cameraLag * dt; // interpolate camera
+
+    // sf::Vector2f pos = sprite.getPosition();        // or getPosition()
+    //  healthBarBack.setPosition({pos.x, pos.y - 10}); // above player sprite
+    //  healthBarFront.setPosition({pos.x, pos.y - 10});
+
+    // float healthRatio = std::max(0.f, static_cast<float>(health) / 200.f);
+    // healthBarFront.setSize({32.f * healthRatio, 4.f});
+    sf::Vector2f playerPos = sprite.getPosition();
+
+    // Position bars above the player sprite
+    healthBarBack.setPosition({playerPos.x - 8, playerPos.y - 10.f});
+    healthBarFront.setPosition({playerPos.x - 8, playerPos.y - 10.f});
+
+    // Scale front bar according to health
+    float healthRatio = std::max(0.f, static_cast<float>(health) / 15.f);
+    healthBarFront.setSize({32.f * healthRatio, 4.f});
 }
 
 void Player::draw(sf::RenderWindow &window)
 {
     window.draw(sprite);
+
+    if (health > 0)
+    {
+        window.draw(healthBarBack);
+        window.draw(healthBarFront);
+    }
 }
 
 int Player::gethealth() { return health; }
@@ -527,6 +556,12 @@ Boss::Boss(GameInfo &gameinfo)
     gi = &gameinfo;
     sprite.setScale({1.5f, 1.5f}); // Adjust as needed
     velocity = {100, 100};         // start moving diagonally
+
+    healthBarBack.setSize({32.f, 4.f});                   // wider than enemies
+    healthBarBack.setFillColor(sf::Color(100, 100, 100)); // dark gray
+
+    healthBarFront.setSize({32.f, 4.f});
+    healthBarFront.setFillColor(sf::Color::Green);
 }
 
 sf::FloatRect Boss::getBounds() const
@@ -541,7 +576,13 @@ void Boss::setpos(sf::Vector2f pos)
 void Boss::draw(sf::RenderWindow &window) const
 {
     if (gi->active)
+    {
         window.draw(sprite);
+        window.draw(healthBarBack);
+        window.draw(healthBarFront);
+    }
+
+
 }
 
 void Boss::update(float dt, sf::RenderWindow &window, std::vector<Bullet> &playerBullets, std::vector<EnemyBullet> &enemyBullets)
@@ -597,6 +638,16 @@ void Boss::update(float dt, sf::RenderWindow &window, std::vector<Bullet> &playe
     handleWallBounce(dt, enemyBullets);
 
     sprite.move(velocity * dt);
+
+    sf::Vector2f playerPos = sprite.getPosition();
+
+    // Position bars above the player sprite
+    healthBarBack.setPosition({playerPos.x - 20, playerPos.y - 10.f});
+    healthBarFront.setPosition({playerPos.x - 20, playerPos.y - 10.f});
+
+    // Scale front bar according to health
+    float healthRatio = std::max(0.f, static_cast<float>(health) / 15.f);
+    healthBarFront.setSize({32.f * healthRatio, 4.f});
 }
 
 void Boss::handleWallBounce(float dt, std::vector<EnemyBullet> &enemyBullets)
