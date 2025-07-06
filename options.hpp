@@ -6,52 +6,52 @@
 #include <algorithm>
 #include "audio.hpp"
 
-class SliderVolume 
+class SliderVolume
 {
 public:
     SliderVolume(float x, float y, float width);
 
-    void handleEvent(const sf::Event& event, const sf::RenderWindow& window);
-    void draw(sf::RenderWindow& window) const;
+    void handleEvent(const sf::Event &event, const sf::RenderWindow &window);
+    void draw(sf::RenderWindow &window) const;
 
-    float getVolume() const;    
+    float getVolume() const;
     void setVolume(float volume);
 
-    void setAudioManager(AudioManager* a) { audio = a; }
+    void setAudioManager(AudioManager *a) { audio = a; }
 
 private:
     sf::RectangleShape bar;
     sf::CircleShape knob;
     sf::Font font;
     sf::Text volumeText;
-    bool isDragging;
+    bool isDragging; // Flag to check if the knob is being dragged
 
     float minX, maxX;
 
     void updateKnobPosition(float mouseX);
 
-    AudioManager* audio = nullptr;
+    AudioManager *audio = nullptr; // Pointer to AudioManager for volume control
 
     void updateText();
 };
 
-class OptionsScreen 
+class OptionsScreen
 {
 public:
     OptionsScreen(AudioManager &audioManager);
-    void draw(sf::RenderWindow& window);
-    void handleEvent(const sf::Event& event, const sf::RenderWindow& window, AudioManager& audioManager);
+    void draw(sf::RenderWindow &window);
+    void handleEvent(const sf::Event &event, const sf::RenderWindow &window, AudioManager &audioManager);
     bool backClicked(sf::Vector2f pos);
     bool creditsClicked(sf::Vector2f pos);
-    void syncWithAudio(AudioManager& audioManager);
+    void syncWithAudio(AudioManager &audioManager);
 
 private:
     sf::Texture bgTexture, optionTexture, musicTexture, backTexture, creditsTexture, musicOnTexture, musicOffTexture;
     sf::Sprite background, optionImage, musicImage, backButton, creditsButton, musicOnButton, musicOffButton;
-    bool musicOn = true;
-    SliderVolume slider;
+    bool musicOn = true; // Track music state
+    SliderVolume slider; // Slider for volume control
 
-    AudioManager* audio = nullptr;
+    AudioManager *audio = nullptr; // Pointer to AudioManager for volume control
 };
 
 #endif

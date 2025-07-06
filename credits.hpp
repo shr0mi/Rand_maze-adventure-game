@@ -3,10 +3,11 @@
 
 #include <SFML/Graphics.hpp>
 
-class CreditsScreen {
+class CreditsScreen
+{
 public:
     CreditsScreen();
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderWindow &window);
     bool backClicked(sf::Vector2f pos);
 
 private:

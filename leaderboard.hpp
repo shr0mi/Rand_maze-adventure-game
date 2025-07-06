@@ -5,19 +5,20 @@
 #include <vector>
 #include <string>
 
-class LeaderboardScreen {
+class LeaderboardScreen
+{
 public:
     LeaderboardScreen();
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderWindow &window);
     bool backClicked(sf::Vector2f pos);
+    void reload(); // Reload scores from the file
 
 private:
     void loadScores();
-    
+
     sf::Texture bgTexture, leaderboardTexture, backTexture;
     sf::Sprite background, leaderboardImage, backButton;
     sf::Font font;
-    //std::vector<int> scores;
     std::vector<sf::Text> scoreTexts;
 };
 

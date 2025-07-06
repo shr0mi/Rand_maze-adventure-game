@@ -1,12 +1,11 @@
 #include "credits.hpp"
 
-CreditsScreen::CreditsScreen() :
-    bgTexture("assets/menubg.png"),
-    creditsTexture("assets/ui_credits.png"),
-    backTexture("assets/backbtn.png"),
-    background(bgTexture),
-    creditsImage(creditsTexture),
-    backButton(backTexture)
+CreditsScreen::CreditsScreen() : bgTexture("assets/menubg.png"),
+                                 creditsTexture("assets/ui_credits.png"),
+                                 backTexture("assets/backbtn.png"),
+                                 background(bgTexture),
+                                 creditsImage(creditsTexture),
+                                 backButton(backTexture)
 {
     background.setPosition({1920, 0}); // Position for credits view
 

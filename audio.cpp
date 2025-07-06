@@ -1,4 +1,3 @@
-// audio.cpp
 #include "options.hpp"
 #include "audio.hpp"
 #include <iostream>
@@ -12,7 +11,7 @@ AudioManager::AudioManager()
     else
     {
         backgroundMusic.setLooping(true);
-        backgroundMusic.setVolume(20.f); // ✅ Set default volume
+        backgroundMusic.setVolume(20.f); // Set default volume
         backgroundMusic.play();
     }
 
@@ -21,6 +20,7 @@ AudioManager::AudioManager()
 
 void AudioManager::toggleMusic()
 {
+    // Toggle the music state
     if (musicOn)
     {
         backgroundMusic.pause();
@@ -35,7 +35,7 @@ void AudioManager::toggleMusic()
 
 void AudioManager::setVolume(float volume)
 {
-    backgroundMusic.setVolume(volume); // Volume is 0 to 100
+    backgroundMusic.setVolume(volume); // Volume range is 0 to 100
 }
 
 bool AudioManager::isMusicOn() const

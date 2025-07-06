@@ -9,13 +9,13 @@ class PauseMenu
 {
 public:
     PauseMenu();
-    void draw(sf::RenderWindow& window, AudioManager &audioManager);
-    void handleEvent(const sf::Event& event, const sf::RenderWindow& window, AudioManager& audioManager);
+    void draw(sf::RenderWindow &window, AudioManager &audioManager);
+    void handleEvent(const sf::Event &event, const sf::RenderWindow &window, AudioManager &audioManager);
 
     bool isResumeClicked(sf::Vector2f pos) const;
     bool isMenuClicked(sf::Vector2f pos) const;
 
-    void syncWithAudio(AudioManager &audioManager);  // New
+    void syncWithAudio(AudioManager &audioManager); // New
 
 private:
     sf::Texture pauseTexture, musicOnTexture, musicOffTexture, menuTexture, resumeTexture;

@@ -8,6 +8,7 @@ enum class Scene
     Menu,
     Options,
     Leaderboard,
+    Controls,
     Credits
 };
 
