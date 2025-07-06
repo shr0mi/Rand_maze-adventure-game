@@ -116,8 +116,8 @@ void runGame(sf::RenderWindow &window)
         return;
     }
     sf::Sprite winSprite(winTexture);
-    winSprite.setPosition({500, 300});
-    winSprite.setScale({0.5f, 0.5f}); // Adjust scale as needed
+    winSprite.setPosition({120, 300});
+    winSprite.setScale({0.4f, 0.4f}); // Adjust scale as needed
 
     sf::Font font;
     if (!font.openFromFile("assets/arial.ttf"))
@@ -126,9 +126,9 @@ void runGame(sf::RenderWindow &window)
         return;
     }
     sf::Text timeText(font);
-    timeText.setCharacterSize(30);
+    timeText.setCharacterSize(50);
     timeText.setFillColor(sf::Color::Yellow);
-    timeText.setPosition({380, 500}); // Adjust to position text below the sprite
+    timeText.setPosition({300, 500}); // Adjust to position text below the sprite
 
     while (window.isOpen())
     {
@@ -174,7 +174,7 @@ void runGame(sf::RenderWindow &window)
             {
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X))
                 {
-                    isOver = true;
+                    isOver = !isOver;
                 }
             }
 
@@ -202,9 +202,9 @@ void runGame(sf::RenderWindow &window)
         float dt = clock.restart().asSeconds();
 
         // Pause
-        gameTimer.update(dt, isPaused);
+        gameTimer.update(dt, isPaused, isOver);
 
-        if (!isPaused)
+        if (!isPaused && !isOver)
         {
             player.cheatlook(window, dt);
 

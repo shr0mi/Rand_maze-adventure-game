@@ -20,19 +20,19 @@ MenuScreen::MenuScreen() :
 {
     background.setPosition({0, 0});
 
-    playButton.setPosition({390, 200});
+    playButton.setPosition({390, 160}); // 200
     playButton.setScale({0.3f, 0.3f});
 
-    optionButton.setPosition({390, 310});
+    optionButton.setPosition({390, 260}); // 310
     optionButton.setScale({0.3f, 0.3f});
 
-    boardButton.setPosition({390, 350});
+    boardButton.setPosition({370, 350});
     boardButton.setScale({0.2f, 0.2f});
 
     nameSprite.setPosition({120, 50});
     nameSprite.setScale({0.25f, 0.25f});
 
-    exitButton.setPosition({390, 420});
+    exitButton.setPosition({390, 420}); // 420
     exitButton.setScale({0.3f, 0.3f});
 
 }

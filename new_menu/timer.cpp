@@ -16,9 +16,9 @@ GameTimer::GameTimer() : totalTime(0.0f), timerText(font, "", 30)
     timerText.setPosition({10, 10});
 }
 
-void GameTimer::update(float dt, bool isPaused)
+void GameTimer::update(float dt, bool isPaused, bool isOver)
 {
-    if (!isPaused)
+    if (!isPaused && !isOver)  // Only update time if not paused or game over
     {
         totalTime += dt;
         updateText();
