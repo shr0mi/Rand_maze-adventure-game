@@ -15,8 +15,13 @@ public:
     int get_minutes();
     int get_seconds();
 
+    void setKeyCount(int count); // <-- NEW
+
+
 private:
     float totalTime;
+
+    int keyCount = 0; // <-- NEW
     sf::Font font;
     sf::Text timerText;
 

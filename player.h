@@ -51,11 +51,14 @@ private:
     const sf::Vector2f normalViewSize{500.f, 500.f};                                  // your normal view size
     const sf::Vector2f cheatViewSize{normalViewSize.x * 5.f, normalViewSize.y * 5.f}; // wider cheat view
 
-    int health = 200;
+    int health = 15;
     float invincibleTimer = 0.2f;
     const float INVINCIBLE_TIME = 2.0f;
 
     void checkBulletCollisions(std::vector<EnemyBullet> &enemyBullets);
+
+    sf::RectangleShape healthBarBack;
+    sf::RectangleShape healthBarFront;
 };
 
 class Crosshair
@@ -131,7 +134,7 @@ public:
     Boss(GameInfo &gameinfo);
     void setpos(sf::Vector2f position);
     void draw(sf::RenderWindow &window) const;
-    void update(float dt, sf::RenderWindow &window, std::vector<Bullet> &playerBullets, std::vector<EnemyBullet> &enemyBullets);
+    void update(float dt, sf::RenderWindow &window, std::vector<Bullet> &playerBullets, std::vector<EnemyBullet> &enemyBullets,sf::Vector2f pos);
     sf::FloatRect getBounds() const;
 
 private:
@@ -150,8 +153,12 @@ private:
     bool isVisible = true;               // whether to draw the sprite
 
     void handlePlayerBulletCollision(std::vector<Bullet> &playerBullets);
-    void handleWallBounce(float dt, std::vector<EnemyBullet> &enemyBullets);
+    void handleWallBounce(float dt, std::vector<EnemyBullet> &enemyBullets,sf::Vector2f pos);
     bool checkWallCollision(const sf::FloatRect &bounds);
+
+
+    sf::RectangleShape healthBarBack;
+    sf::RectangleShape healthBarFront;
 };
 
 #endif

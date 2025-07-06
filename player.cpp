@@ -3,6 +3,7 @@
 #include "enemy.hpp"
 #include <cmath>
 #include <algorithm>
+#include "audio.hpp"
 
 Player::Player(sf::Texture &tex, int row, int col, std::vector<std::vector<int>> collisionMap, GameInfo &gameInfo)
     : sprite(tex, sf::IntRect({col * 17, row * 17}, {17, 17}))
@@ -11,6 +12,13 @@ Player::Player(sf::Texture &tex, int row, int col, std::vector<std::vector<int>>
     gi = &gameInfo;
     gameInfo.collMap = collisionMap;
     gameInfo.pltex = tex;
+
+    // Inside Player constructor, after sprite setup
+    healthBarBack.setSize({32.f, 4.f});                   // wider than enemies
+    healthBarBack.setFillColor(sf::Color(100, 100, 100)); // dark gray
+
+    healthBarFront.setSize({32.f, 4.f});
+    healthBarFront.setFillColor(sf::Color::Green);
 }
 
 void Player::setPos(sf::Vector2f pos)
@@ -55,10 +63,11 @@ void Player::update(float dt, std::vector<EnemyBullet> &enemyBullets, sf::Render
             else
             {
                 // Respawn done
+                sfx.playSound("respawn");
                 gi->disableshoot = false;
                 isRespawning = false;
                 flickerFrames = 0;
-                health = 4;
+                health = 15;
                 sprite.setPosition(pos);
                 sprite.setTextureRect(playerNormalRect); // restore normal frame
                 sprite.setScale({1.f, 1.f});
@@ -76,11 +85,12 @@ void Player::update(float dt, std::vector<EnemyBullet> &enemyBullets, sf::Render
     // === Bullet collision ===
     sf::FloatRect playerBounds = sprite.getGlobalBounds();
 
-    if (bossbounds.findIntersection(playerBounds).has_value() && gi->active)
+    if (bossbounds.findIntersection(playerBounds).has_value() && gi->active && !gi->bossdeath)
     {
         if (invincibleTimer <= 0.f)
         {
             invincibleTimer = INVINCIBLE_TIME;
+            sfx.playSound("pldmg");
             health--;
             std::cout << "Player hit by Boss! Health: " << health << "\n";
             flickerFrames = 200;
@@ -94,6 +104,7 @@ void Player::update(float dt, std::vector<EnemyBullet> &enemyBullets, sf::Render
             if (invincibleTimer <= 0.f)
             {
                 invincibleTimer = INVINCIBLE_TIME;
+                sfx.playSound("pldmg");
                 health--;
                 std::cout << "Player hit! Health: " << health << "\n";
 
@@ -236,11 +247,33 @@ void Player::update(float dt, std::vector<EnemyBullet> &enemyBullets, sf::Render
         sprite.move(move);  // apply movement
     }
     cameraCenter += (sprite.getPosition() - cameraCenter) * cameraLag * dt; // interpolate camera
+
+    // sf::Vector2f pos = sprite.getPosition();        // or getPosition()
+    //  healthBarBack.setPosition({pos.x, pos.y - 10}); // above player sprite
+    //  healthBarFront.setPosition({pos.x, pos.y - 10});
+
+    // float healthRatio = std::max(0.f, static_cast<float>(health) / 200.f);
+    // healthBarFront.setSize({32.f * healthRatio, 4.f});
+    sf::Vector2f playerPos = sprite.getPosition();
+
+    // Position bars above the player sprite
+    healthBarBack.setPosition({playerPos.x - 8, playerPos.y - 10.f});
+    healthBarFront.setPosition({playerPos.x - 8, playerPos.y - 10.f});
+
+    // Scale front bar according to health
+    float healthRatio = std::max(0.f, static_cast<float>(health) / 15.f);
+    healthBarFront.setSize({32.f * healthRatio, 4.f});
 }
 
 void Player::draw(sf::RenderWindow &window)
 {
     window.draw(sprite);
+
+    if (health > 0)
+    {
+        window.draw(healthBarBack);
+        window.draw(healthBarFront);
+    }
 }
 
 int Player::gethealth() { return health; }
@@ -266,7 +299,7 @@ sf::View Player::getCurrentView() const
     return view;
 }
 
-void Player::cheatlook(sf::RenderWindow &, float dt)
+void Player::cheatlook(sf::RenderWindow &window, float dt)
 {
     bool keyOneNow = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num1);
     bool keyZeroNow = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Num0);
@@ -286,6 +319,7 @@ void Player::cheatlook(sf::RenderWindow &, float dt)
 
     if (debugMode)
     {
+        window.setMouseCursorVisible(false);
         float speed = 1600.f * dt;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
             cheatCameraCenter.x -= speed;
@@ -370,14 +404,14 @@ void handleShooting(std::vector<Bullet> &bullets, sf::Texture &tex, const sf::Ve
     if (isMousePressed && !wasMousePressed)
     {
         // Just clicked this frame (mouse down event)
-
+        sfx.playSound("plshoot");
         sf::Vector2i mousePixel = sf::Mouse::getPosition(window);
         sf::Vector2f mouseWorld = window.mapPixelToCoords(mousePixel);
 
         sf::Vector2f playercenter = playerPos;
         sf::Vector2f mousecenter = mouseWorld - sf::Vector2f(8.f, 8.f);
 
-        bullets.emplace_back(tex, playercenter, mousecenter, 4, 22); // adjust sprite row/col
+        bullets.emplace_back(tex, playercenter, mousecenter, 13, 39); // adjust sprite row/col
     }
 
     // Update mouse state for next frame
@@ -453,7 +487,7 @@ void Key::checkCollision(const sf::Vector2f &playerPos, float radius)
     float dist = std::hypot(playerPos.x - keyPos.x, playerPos.y - keyPos.y);
 
     if (dist < radius)
-        collected = true;
+       {sfx.playSound("kcoll"); collected = true;}
 }
 
 bool Key::isCollected() const
@@ -489,6 +523,7 @@ void Chest::tryOpen(const sf::Vector2f &playerPos, float radius, bool allKeysCol
 
     if (!opened && dist < radius && allKeysCollected)
     {
+        sfx.playSound("chest");
         opened = true;
         sprite.setTextureRect(sf::IntRect({11 * 17, 6 * 17}, {16, 16}));
         sprite.setColor(sf::Color::Yellow); // Update to opened chest tile
@@ -527,6 +562,12 @@ Boss::Boss(GameInfo &gameinfo)
     gi = &gameinfo;
     sprite.setScale({1.5f, 1.5f}); // Adjust as needed
     velocity = {100, 100};         // start moving diagonally
+
+    healthBarBack.setSize({32.f, 4.f});                   // wider than enemies
+    healthBarBack.setFillColor(sf::Color(100, 100, 100)); // dark gray
+
+    healthBarFront.setSize({32.f, 4.f});
+    healthBarFront.setFillColor(sf::Color::Green);
 }
 
 sf::FloatRect Boss::getBounds() const
@@ -540,21 +581,30 @@ void Boss::setpos(sf::Vector2f pos)
 }
 void Boss::draw(sf::RenderWindow &window) const
 {
-    if (gi->active)
+    if (gi->active && !gi->bossdeath)
+    {
         window.draw(sprite);
+        window.draw(healthBarBack);
+        window.draw(healthBarFront);
+    }
+
+
 }
 
-void Boss::update(float dt, sf::RenderWindow &window, std::vector<Bullet> &playerBullets, std::vector<EnemyBullet> &enemyBullets)
+void Boss::update(float dt, sf::RenderWindow &window, std::vector<Bullet> &playerBullets, std::vector<EnemyBullet> &enemyBullets,sf::Vector2f pos)
 {
     if (!gi->active)
         return;
 
     if (defeated)
     {
+        if(deathTimer <=.4f ) {sfx.playSound("bdefeat");sfx.setVolume(20.f);}
+        sfx.setVolume(50.f);
         deathTimer += dt;
         if (deathTimer > 0.8f)
         {
             gi->active = false;
+            gi->bossdeath = true;
         }
         return;
     }
@@ -564,7 +614,8 @@ void Boss::update(float dt, sf::RenderWindow &window, std::vector<Bullet> &playe
     if (health <= 0)
     {
         defeated = true;
-        gi->bossdeath = true;
+        healthBarBack.setFillColor(sf::Color::Transparent);
+        healthBarFront.setFillColor(sf::Color::Transparent);
         sprite.setTextureRect(sf::IntRect({38 * 17, 14 * 17}, {16, 16})); // death sprite
         return;
     }
@@ -573,33 +624,55 @@ void Boss::update(float dt, sf::RenderWindow &window, std::vector<Bullet> &playe
     {
         angry = true;
         sprite.setTextureRect(sf::IntRect({36 * 17, 14 * 17}, {16, 16})); // angry sprite
-        velocity *= 2.f;                                                  // speed boost
+        velocity *= 2.f; // speed boost
     }
 
-    // Handle hit flash timer
-    // Handle hit flash transparency
+    // Hit flash effect
     if (hitFlashTimer > 0.f)
     {
         hitFlashTimer -= dt;
-
-        // Make sprite transparent while flashing
-        sprite.setColor(sf::Color(255, 255, 255, 100)); // 100 = semi-transparent
+        sprite.setColor(sf::Color(255, 255, 255, 100)); // semi-transparent
     }
     else
     {
-        // Restore full opacity
-        sprite.setColor(sf::Color(255, 255, 255, 255));
+        sprite.setColor(sf::Color(255, 255, 255, 255)); // full opacity
     }
 
+    // Predict next bounds
     sf::FloatRect nextBounds = sprite.getGlobalBounds();
     nextBounds.position += velocity * dt;
 
-    handleWallBounce(dt, enemyBullets);
-
+    handleWallBounce(dt, enemyBullets,pos);
     sprite.move(velocity * dt);
+
+    // === Health Bar Setup ===
+    // === Health Bar Setup ===
+sf::FloatRect bounds = sprite.getGlobalBounds();
+sf::Vector2f center = bounds.position + bounds.size / 2.f;
+
+const float barWidth = 20.f;
+const float barHeight = 4.f;
+
+healthBarBack.setSize({barWidth, barHeight});
+healthBarBack.setFillColor(sf::Color(50, 50, 50));
+healthBarBack.setPosition({
+    center.x - barWidth / 2.f,
+    center.y - bounds.size.y / 2.f - 10.f
+});
+
+healthBarFront.setPosition(healthBarBack.getPosition());
+
+// Health is in 10 chunks, each chunk = 4 HP
+float ratio = std::clamp(health / 40.f, 0.f, 1.f); // Ensures ratio is between 0 and 1
+
+healthBarFront.setSize({barWidth * ratio, barHeight});
+healthBarFront.setFillColor(sf::Color::Green);
+
 }
 
-void Boss::handleWallBounce(float dt, std::vector<EnemyBullet> &enemyBullets)
+
+
+void Boss::handleWallBounce(float dt, std::vector<EnemyBullet> &enemyBullets,sf::Vector2f pos)
 {
     // accumulate shoot timer
     timeSinceLastShot += dt;
@@ -610,14 +683,24 @@ void Boss::handleWallBounce(float dt, std::vector<EnemyBullet> &enemyBullets)
 
     bool bounced = false;
 
+
+
+    sf::Vector2f bossPos = sprite.getPosition();
+    float distance = std::hypot(bossPos.x - pos.x, bossPos.y - pos.y);
+    float maxDistance = 800.f;
+    float volume = 90.f - (distance / maxDistance) * (70.f);
+    volume = std::clamp(volume, 20.f, 90.f);
+
     if (checkWallCollision({{nextBounds.position.x, current.position.y}, nextBounds.size}))
     {
+        sfx.playSoundWithVolume("bshoot", volume);
         velocity.x = -velocity.x;
         bounced = true;
     }
 
     if (checkWallCollision({{current.position.x, nextBounds.position.y}, nextBounds.size}))
     {
+        sfx.playSoundWithVolume("bshoot", volume);
         velocity.y = -velocity.y;
         bounced = true;
     }
@@ -665,6 +748,7 @@ void Boss::handlePlayerBulletCollision(std::vector<Bullet> &playerBullets)
         // Check collision using findIntersection to match your existing style
         if (it->getBounds().findIntersection(bossBounds).has_value())
         {
+            sfx.playSound("bsdmg");
             health--;
             hitFlashTimer = hitFlashDuration; // start hit flash effect
             isVisible = false;

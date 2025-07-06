@@ -4,6 +4,7 @@
 #include <vector>
 #include <cmath>
 
+
 // === Constants ===
 constexpr float PLAYER_SPEED = 70.0f;  // Speed of the player
 constexpr float ENEMY_SPEED = 100.0f;  // Speed of enemies

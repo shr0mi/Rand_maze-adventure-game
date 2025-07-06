@@ -16,3 +16,21 @@ private:
     sf::Music backgroundMusic;
     bool musicOn = true; // Track music state
 };
+
+class SFXManager {
+public:
+    SFXManager();                 
+    void playSound(const std::string& name);  
+    void setVolume(float volume);
+    float getVolume() const;
+    void playSoundWithVolume(const std::string& name, float volume);
+
+private:
+    std::unordered_map<std::string, sf::SoundBuffer> buffers;
+    std::unordered_map<std::string, sf::Sound> sounds;
+    float volume = 50.f;
+    
+    void loadAllSounds(); 
+};
+
+extern SFXManager sfx;
