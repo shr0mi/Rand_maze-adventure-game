@@ -1,0 +1,55 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "Build Game Project with SFML",
+            "command": "E:/msys64/ucrt64/bin/g++.exe",
+            "args": [
+                  "-fdiagnostics-color=always",
+                "-g",
+                /*"-static",
+                "-static-libgcc",
+                "-static-libstdc++",*/
+                "-DSFML_STATIC",
+                "main.cpp",
+                "player.cpp",
+                "enemy.cpp",
+                "mapgen.cpp",
+                "bsp_algorithm.cpp",
+                "-IE:/C++ Library/SFML-3.0.0/include",
+                "-o",
+                "${fileDirname}/main.exe",
+                "-LE:/C++ Library/SFML-3.0.0/lib",
+                "-Wl,-Bstatic",
+                "-lsfml-graphics-s",
+                "-lsfml-window-s",
+                "-lsfml-system-s",
+                "-lsfml-audio-s",
+                "-lopengl32",
+                "-lfreetype",
+                "-lwinmm",
+                "-lgdi32",
+                "-lflac",
+                "-lvorbisenc",
+                "-lvorbisfile",
+                "-lvorbis",
+                "-logg",
+                "-Wl,-Bdynamic",
+                "-mconsole"
+            
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Full build task for SFML Game Project"
+        }
+    ]
+}
