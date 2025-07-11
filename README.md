@@ -5,6 +5,13 @@ Explore procedurally generated dungeons using Binary Space Partitioning (BSP), f
 
 ---
 
+## Dependencies
+  - SFML v3.0
+  - Background Music: [An-Instant-Burst-Action-02](https://onemansymphony.bandcamp.com/track/an-instant-burst-action-02)
+  - Assets: [Kenny Assets](https://kenney.nl/assets)
+
+---
+
 ## Build Instruction
 
 ### Install SFML v3.0
