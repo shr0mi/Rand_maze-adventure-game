@@ -7,6 +7,14 @@ Explore procedurally generated dungeons using Binary Space Partitioning (BSP), f
 
 ---
 
+## Play The Game
+
+Windows: 
+
+Download & Extract the game: [download link](https://www.dropbox.com/scl/fi/4v6q7cxe58hkpcgeat7r0/Rand-maze-Adventure.zip?rlkey=1vgti54svkf3ihwb6vmmcumvm&st=e0qmikt3&dl=0)
+
+---
+
 ## Dependencies
   - SFML v3.0
   - Background Music: [An-Instant-Burst-Action-02](https://onemansymphony.bandcamp.com/track/an-instant-burst-action-02) composed by One Man Symphony
