@@ -42,4 +42,4 @@ Windows:
 
 ## About
 
-This is a project for CSE-1202:Structured Programming Course
+This is a project for CSE-1202:Structured Programming Course :)
