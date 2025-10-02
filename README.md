@@ -3,6 +3,8 @@
 A top-down roguelike action game built with C++ and SFML.
 Explore procedurally generated dungeons using Binary Space Partitioning (BSP) algorithm, fight enemies, collect 3 keys, and defeat the boss to unlock the final treasure chest.
 
+Gameplay video: [YouTube](https://www.youtube.com/watch?v=ufcz9ZuGLYw)
+
 ![Game Preview](assets/game-preview.gif)
 
 ---
